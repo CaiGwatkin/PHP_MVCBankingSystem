@@ -47,6 +47,28 @@ class AccountModel extends Model
 
         return $this;
     }
+    
+    /**
+     * Checks that login details are valid.
+     *
+     * @param string $username An account username.
+     * @param string $password The password.
+     *
+     * @return $id ID of account, if valid.
+     */
+    public function checkLogin(string $username, string $password)
+    {
+        if (!$result = $this->db->query("SELECT `id`, `password` FROM `account` WHERE `username` = $username;")) {
+            return null;
+        }
+        $result = $result->fetch_assoc();
+        if (!password_verify($password, $result['password'])) {
+            return null;
+        }
+        else {
+            return $result['id'];
+        }
+    }
 
     /**
      * Loads account information from the database

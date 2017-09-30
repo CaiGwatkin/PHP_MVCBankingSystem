@@ -48,8 +48,8 @@ class View
     /**
      * Adds a key/value pair to be available to phtml template
      *
-     * @param $key name of the data to be available
-     * @param $val value of the data to be available
+     * @param string $key Name of the data to be available
+     * @param mixed $val Value of the data to be available
      *
      * @return $this View
      */

@@ -14,13 +14,54 @@ use cgwatkin\a2\view\View;
 class AccountController extends Controller
 {
     /**
+     * Account Login action
+     */
+    public function loginAction()
+    {
+        if (isset($_POST['login'])) {
+            $username = $_POST['username'];
+            $account = new AccountModel();
+            if (!$id = $account->checkLogin($username, $_POST['password'])) {
+                $view = new View('accountLoginFailed');
+                echo $view->addData('username', $username)
+                    ->render();
+            }
+            else if ($username == "admin") {
+                $collection = new AccountCollectionModel();
+                $accounts = $collection->getAccounts();
+                $view = new View('accountIndex');
+                echo $view->addData('accounts', $accounts)
+                    ->addData(
+                        'linkTo', function ($route,$params=[]) {
+                        return $this->linkTo($route, $params);
+                    }
+                    )
+                    ->render();
+            }
+            else {
+                $account = new AccountModel();
+                $account->load($id);
+                // TODO: generate new "My Account" view
+//                $view = new View('accountMyAccount');
+//                echo $view->addData('account', $account)
+//                    ->addData(
+//                        'linkTo', function ($route,$params=[]) {
+//                        return $this->linkTo($route, $params);
+//                    }
+//                    )
+//                    ->render();
+            }
+        }
+    }
+    
+    /**
      * Account Index action
      */
-    public function indexAction() 
+    public function listAction()
     {
         $collection = new AccountCollectionModel();
         $accounts = $collection->getAccounts();
-        $view = new View('accountIndex');
+        $view = new View('accountList');
         echo $view->addData('accounts', $accounts)
             ->addData(
                 'linkTo', function ($route,$params=[]) {

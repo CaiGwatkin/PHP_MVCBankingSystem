@@ -46,7 +46,8 @@ class Model
             $result = $this->db->query(
                                 "CREATE TABLE `user_account` (
                                           `id` int(8) unsigned NOT NULL AUTO_INCREMENT,
-                                          `name` varchar(256) DEFAULT NULL,
+                                          `username` varchar(256) NOT NULL UNIQUE,
+                                          `password` varchar(256) DEFAULT NULL,
                                           PRIMARY KEY (`id`) );"
             );
 
@@ -56,7 +57,10 @@ class Model
             }
 
             if(!$this->db->query(
-                "INSERT INTO `account` VALUES (NULL,'Bob'), (NULL,'Mary');"
+                "INSERT INTO `account`
+                        VALUES (NULL,'admin',password_hash('admin', PASSWORD_DEFAULT)),
+                            (NULL,'Bob',password_hash('bob', PASSWORD_DEFAULT)),
+                            (NULL,'Mary',password_hash('mary', PASSWORD_DEFAULT));"
             )) {
                 // handle appropriately
                 error_log("Failed creating sample data!",0);
