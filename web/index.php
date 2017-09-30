@@ -1,8 +1,8 @@
 <?php
 /**
  * 159.339 Internet Programming 2017.2
- * Student ID: 99999999
- * Assignment: 2   Date: 01/09/17
+ * Student ID: 15146508
+ * Assignment: 2   Date: 30/09/17
  * System: PHP 7.1
  * Code guidelines: PSR-1, PSR-2
  *
@@ -20,6 +20,10 @@ use PHPRouter\Router;
 use PHPRouter\Route;
 
 define('APP_ROOT', __DIR__);
+define('DB_HOST', 'mysql');
+define('DB_USER', 'root');
+define('DB_PASS', 'root');
+define('DB_NAME', 'cgwatkin_a2');
 
 $collection = new RouteCollection();
 

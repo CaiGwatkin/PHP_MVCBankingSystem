@@ -1,6 +1,6 @@
 FROM php:7.1
 
-MAINTAINER Andrew Gilman <a.gilman@massey.ac.nz>
+LABEL "maintainer"="Cai Gwatkin <caigwatkin@gmail.com>"
 
 RUN apt-get update && apt-get upgrade -y \
     libfreetype6-dev \
