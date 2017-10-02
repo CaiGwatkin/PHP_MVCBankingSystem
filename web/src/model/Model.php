@@ -21,8 +21,8 @@ class Model
         $this->db = new mysqli(
             DB_HOST,
             DB_USER,
-            DB_PASS,
-            DB_NAME
+            DB_PASS/*,
+            DB_NAME*/
         );
 
         if (!$this->db) {
@@ -37,30 +37,28 @@ class Model
             throw new NoMySQLException("Mysql database not available!", 0);
         }
 
-        $result = $this->db->query("SHOW TABLES LIKE 'account';");
+        $result = $this->db->query("SHOW TABLES LIKE 'user_account';");
 
         if ($result->num_rows == 0) {
             // table doesn't exist
             // create it and populate with sample data
 
             $result = $this->db->query(
-                                "CREATE TABLE `user_account` (
-                                          `id` int(8) unsigned NOT NULL AUTO_INCREMENT,
-                                          `username` varchar(256) NOT NULL UNIQUE,
-                                          `password` varchar(256) DEFAULT NULL,
-                                          PRIMARY KEY (`id`) );"
+                                "CREATE TABLE user_account (
+                                          id int(8) unsigned NOT NULL AUTO_INCREMENT,
+                                          username varchar(256) NOT NULL UNIQUE,
+                                          pwd varchar(256) DEFAULT NULL,
+                                          PRIMARY KEY (id) );"
             );
-
             if (!$result) {
                 // handle appropriately
                 error_log("Failed creating table account",0);
             }
-
             if(!$this->db->query(
-                "INSERT INTO `account`
-                        VALUES (NULL,'admin',password_hash('admin', PASSWORD_DEFAULT)),
-                            (NULL,'Bob',password_hash('bob', PASSWORD_DEFAULT)),
-                            (NULL,'Mary',password_hash('mary', PASSWORD_DEFAULT));"
+                "INSERT INTO user_account
+                        VALUES (NULL,'admin','".password_hash('admin', PASSWORD_DEFAULT)."'),
+                            (NULL,'Bob','".password_hash('bob', PASSWORD_DEFAULT)."'),
+                            (NULL,'Mary','".password_hash('mary', PASSWORD_DEFAULT)."');"
             )) {
                 // handle appropriately
                 error_log("Failed creating sample data!",0);

@@ -58,11 +58,14 @@ class AccountModel extends Model
      */
     public function checkLogin(string $username, string $password)
     {
-        if (!$result = $this->db->query("SELECT `id`, `password` FROM `account` WHERE `username` = $username;")) {
+        if (!$result = $this->db->query(
+                "SELECT id, pwd FROM user_account WHERE username = '$username';")) {
+            error_log("no results for username",0);
             return null;
         }
         $result = $result->fetch_assoc();
-        if (!password_verify($password, $result['password'])) {
+        if (!password_verify($password, $result['pwd'])) {
+            error_log("password doesn't match",0);
             return null;
         }
         else {
@@ -79,7 +82,7 @@ class AccountModel extends Model
      */
     public function load($id)
     {
-        if (!$result = $this->db->query("SELECT * FROM `account` WHERE `id` = $id;")) {
+        if (!$result = $this->db->query("SELECT * FROM user_account WHERE id = $id;")) {
             // throw new ...
         }
 
@@ -100,13 +103,13 @@ class AccountModel extends Model
         $name = $this->_name??"NULL";
         if (!isset($this->_id)) {
             // New account - Perform INSERT
-            if (!$result = $this->db->query("INSERT INTO `account` VALUES (NULL,'$name');")) {
+            if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name');")) {
                 // throw new ...
             }
             $this->_id = $this->db->insert_id;
         } else {
             // saving existing account - perform UPDATE
-            if (!$result = $this->db->query("UPDATE `account` SET `name` = '$name' WHERE `id` = $this->_id;")) {
+            if (!$result = $this->db->query("UPDATE user_account SET name = '$name' WHERE id = $this->_id;")) {
                 // throw new ...
             }
 
@@ -122,7 +125,7 @@ class AccountModel extends Model
      */
     public function delete()
     {
-        if (!$result = $this->db->query("DELETE FROM `account` WHERE `account`.`id` = $this->_id;")) {
+        if (!$result = $this->db->query("DELETE FROM user_account WHERE user_account.id = $this->_id;")) {
             //throw new ...
         }
 

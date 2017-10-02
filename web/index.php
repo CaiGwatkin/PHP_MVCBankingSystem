@@ -29,7 +29,17 @@ $collection = new RouteCollection();
 
 $collection->attachRoute(
     new Route(
-        '/account/', array(
+        '/account', array(
+            '_controller' => 'cgwatkin\a2\controller\AccountController::indexAction',
+            'methods' => 'GET',
+            'name' => 'accountIndex'
+        )
+    )
+);
+
+$collection->attachRoute(
+    new Route(
+        '/account', array(
             '_controller' => 'cgwatkin\a2\controller\AccountController::loginAction',
             'methods' => 'POST',
             'name' => 'accountLogin'

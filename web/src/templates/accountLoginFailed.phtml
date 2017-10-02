@@ -1,9 +1,11 @@
 <?php include "header.phtml" ?>
 <!---------- Body starts --------------->
 <h1>Login</h1>
-<form method="POST" action="../../index.php">
+<form method="POST">
     <label><b>Username</b></label>
-    <input type="text" name="username" value="<?= $accountId ?>" required>
+    <input type="text" name="username" value="<?= $username ?>" required>
+
+    <br>
     
     <label><b>Password</b></label>
     <input type="password" placeholder="Enter Password" name="password" required>

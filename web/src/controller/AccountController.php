@@ -3,6 +3,7 @@ namespace cgwatkin\a2\controller;
 
 use cgwatkin\a2\model\AccountModel;
 use cgwatkin\a2\model\AccountCollectionModel;
+use cgwatkin\a2\model\Model;
 use cgwatkin\a2\view\View;
 
 /**
@@ -13,23 +14,33 @@ use cgwatkin\a2\view\View;
  */
 class AccountController extends Controller
 {
+    public function indexAction()
+    {
+        new Model(); // create table if not exist
+        $view = new View('accountLogin');
+        echo $view->render();
+    }
+
     /**
      * Account Login action
      */
     public function loginAction()
     {
         if (isset($_POST['login'])) {
+//            error_log("post received",0);
             $username = $_POST['username'];
             $account = new AccountModel();
             if (!$id = $account->checkLogin($username, $_POST['password'])) {
+                error_log("login failed",0);
                 $view = new View('accountLoginFailed');
                 echo $view->addData('username', $username)
                     ->render();
             }
             else if ($username == "admin") {
+//                error_log("admin login",0);
                 $collection = new AccountCollectionModel();
                 $accounts = $collection->getAccounts();
-                $view = new View('accountIndex');
+                $view = new View('accountList');
                 echo $view->addData('accounts', $accounts)
                     ->addData(
                         'linkTo', function ($route,$params=[]) {
@@ -39,6 +50,7 @@ class AccountController extends Controller
                     ->render();
             }
             else {
+//                error_log("other login",0);
                 $account = new AccountModel();
                 $account->load($id);
                 // TODO: generate new "My Account" view
@@ -52,6 +64,11 @@ class AccountController extends Controller
 //                    ->render();
             }
         }
+//        else {
+////            error_log("no post received",0);
+//            $view = new View('accountLogin');
+//            echo $view->render();
+//        }
     }
     
     /**
