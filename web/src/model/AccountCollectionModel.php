@@ -4,6 +4,8 @@ namespace cgwatkin\a2\model;
 /**
  * Class AccountCollectionModel
  *
+ * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
+ *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */

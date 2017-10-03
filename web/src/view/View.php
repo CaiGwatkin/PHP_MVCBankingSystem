@@ -14,6 +14,8 @@ namespace cgwatkin\a2\view;
  * A wrapper for the view templates.
  * Limits the accessible scope available to phtml templates.
  *
+ * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
+ *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */

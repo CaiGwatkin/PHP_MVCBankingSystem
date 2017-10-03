@@ -1,20 +1,13 @@
 <?php include "header.phtml" ?>
-<!---------- Body starts --------------->
 <h1>Login</h1>
 <form method="POST">
     <label><b>Username</b></label>
     <input type="text" name="username" value="<?= $username ?>" required>
-
     <br>
-    
     <label><b>Password</b></label>
     <input type="password" placeholder="Enter Password" name="password" required>
-    
     <button type="submit" name="login">Login</button>
 </form>
-
 <p>Invalid username and/or password.</p>
-
 <br>
-<!---------- Body ends -------------------->
 <?php include "footer.phtml" ?>

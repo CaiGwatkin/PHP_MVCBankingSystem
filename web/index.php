@@ -8,6 +8,8 @@
  *
  * FRONT CONTROLLER - Responsible for URL routing and User Authentication
  *
+ * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
+ *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  **/
@@ -33,7 +35,7 @@ $collection->attachRoute(
             '_controller' => 'cgwatkin\a2\controller\Controller::redirectAction',
             'methods' => 'GET',
             'name' => 'indexRedirect',
-            'parameters' => array('/account')
+            'parameters' => array('url' => '/account')
         )
     )
 );

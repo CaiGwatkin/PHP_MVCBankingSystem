@@ -9,6 +9,8 @@ use cgwatkin\a2\view\View;
 /**
  * Class AccountController
  *
+ * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
+ *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */

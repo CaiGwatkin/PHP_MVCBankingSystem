@@ -9,6 +9,8 @@ use mysqli;
  *
  * Connects to and configures the MySQL database with dummy data for testing.
  *
+ * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
+ *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */

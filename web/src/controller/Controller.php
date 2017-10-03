@@ -5,6 +5,8 @@ namespace cgwatkin\a2\controller;
 /**
  * Class Controller
  *
+ * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
+ *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */
