@@ -5,7 +5,7 @@ namespace cgwatkin\a2\exception;
 /**
  * Class NoMySQLException
  *
- * Used when MySQL cannot be loaded.
+ * Thrown when a MySQL query returns null.
  *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
@@ -21,5 +21,6 @@ class MySQLQueryException extends \Exception
     public function MySQLQueryException($message, $code = 0)
     {
         parent::__construct($message, $code);
+        error_log($message);
     }
 }

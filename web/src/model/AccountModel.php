@@ -1,5 +1,6 @@
 <?php
 namespace cgwatkin\a2\model;
+
 use cgwatkin\a2\exception\MySQLQueryException;
 
 
@@ -85,7 +86,7 @@ class AccountModel extends Model
     public function load($id)
     {
         if (!$result = $this->db->query("SELECT id, username FROM user_account WHERE id = $id;")) {
-            throw new MySQLQueryException('Query returns null from AccountModel::load');
+//            throw new MySQLQueryException('Query returns null from AccountModel::load');
         }
         $result = $result->fetch_assoc();
         $this->_name = $result['username'];
@@ -104,14 +105,16 @@ class AccountModel extends Model
         $name = $this->_name??"NULL";
         if (!isset($this->_id)) {
             // New account - Perform INSERT
-            if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name');")) {
-                throw new MySQLQueryException('Query returns null from INSERT in AccountModel::save');
+            if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name','"
+                .password_hash('test', PASSWORD_DEFAULT)."');")) {
+                //TODO make work
+//                throw new MySQLQueryException('Query returns null from INSERT in AccountModel::save');
             }
             $this->_id = $this->db->insert_id;
         } else {
             // saving existing account - perform UPDATE
             if (!$result = $this->db->query("UPDATE user_account SET name = '$name' WHERE id = $this->_id;")) {
-                throw new MySQLQueryException('Query returns null from UPDATE in AccountModel::save');
+//                throw new MySQLQueryException('Query returns null from UPDATE in AccountModel::save');
             }
 
         }
@@ -128,7 +131,7 @@ class AccountModel extends Model
     public function delete()
     {
         if (!$result = $this->db->query("DELETE FROM user_account WHERE user_account.id = $this->_id;")) {
-            throw new MySQLQueryException('Query returns null from AccountModel::delete');
+//            throw new MySQLQueryException('Query returns null from AccountModel::delete');
         }
 
         return $this;

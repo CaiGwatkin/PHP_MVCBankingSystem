@@ -1,6 +1,8 @@
 <?php
 namespace cgwatkin\a2\model;
 
+use cgwatkin\a2\exception\MySQLQueryException;
+
 /**
  * Class AccountCollectionModel
  *
@@ -18,8 +20,8 @@ class AccountCollectionModel extends Model
     function __construct()
     {
         parent::__construct();
-        if (!$result = $this->db->query("SELECT id FROM user_account;")) {
-            // TODO throw new ...
+        if (!$result = $this->db->query("SELECT id FROM user_account ORDER BY id;")) {
+            throw new MySQLQueryException('Query returns null from AccountCollectionModel::__construct');
         }
         $this->_accountIds = array_column($result->fetch_all(), 0);
         $this->_N = $result->num_rows;

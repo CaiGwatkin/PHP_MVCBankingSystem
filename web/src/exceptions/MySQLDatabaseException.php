@@ -5,7 +5,7 @@ namespace cgwatkin\a2\exception;
 /**
  * Class MySQLDatabaseException
  *
- * Used when MySQL database cannot be loaded.
+ * Thrown when MySQL database cannot be loaded.
  *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
@@ -21,5 +21,6 @@ class MySQLDatabaseException extends \Exception
     public function NoMySQLException($message, $code = 0)
     {
         parent::__construct($message, $code);
+        error_log($message);
     }
 }
