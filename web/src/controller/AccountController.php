@@ -135,19 +135,23 @@ class AccountController extends Controller
     public function createAction() 
     {
         $account = new AccountModel();
-        $names = ['Bob','Mary','Jon','Peter','Grace'];
-        shuffle($names);
-        $account->setName($names[0]); // will come from Form data
-        $account->save();
-        $id = $account->getId();
-        $view = new View('accountCreated');
-        echo $view->addData('accountId', $id)
-            ->addData(
-                'linkTo', function ($route,$params=[]) {
+//        $names = ['Bob','Mary','Jon','Peter','Grace'];
+//        shuffle($names);
+        session_start();
+        if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin' && isset($_POST['create'])) {
+            $account->setName($_POST['username'])
+                ->setPassword;
+            $account->save();
+            $id = $account->getId();
+            $view = new View('accountCreated');
+            echo $view->addData('accountId', $id)
+                ->addData(
+                    'linkTo', function ($route,$params=[]) {
                     return $this->linkTo($route, $params);
                 }
-            )
-                  ->render();
+                )
+                ->render();
+        }
     }
 
     /**

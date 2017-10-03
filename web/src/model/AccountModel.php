@@ -23,6 +23,11 @@ class AccountModel extends Model
      */
     private $_name;
 
+    /**
+     * @var string Account password
+     */
+    private $_password;
+
 
     /**
      * @return int Account ID
@@ -51,6 +56,18 @@ class AccountModel extends Model
 
         return $this;
     }
+
+    /**
+     * @param string $_password Account password
+     *
+     * @return $this AccountModel
+     */
+    public function setPassword(string $_password)
+    {
+        $this->_password = $_password;
+
+        return $this;
+    }
     
     /**
      * Checks that login details are valid.
@@ -67,7 +84,7 @@ class AccountModel extends Model
             return null;
         }
         $result = $result->fetch_assoc();
-        if (!password_verify($password, $result['pwd'])) {
+        if (!password_verify($result['id'].$password, $result['pwd'])) {
             return null;
         }
         else {

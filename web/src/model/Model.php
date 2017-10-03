@@ -1,7 +1,7 @@
 <?php
 namespace cgwatkin\a2\model;
 
-use cgwatkin\a2\NoMySQLException;
+use cgwatkin\a2\exception\MySQLDatabaseException;
 use mysqli;
 
 /**
@@ -27,7 +27,7 @@ class Model
         );
 
         if (!$this->db) {
-            throw new NoMySQLException($this->db->connect_error, $this->db->connect_errno);
+            throw new MySQLDatabaseException($this->db->connect_error, $this->db->connect_errno);
         }
 
         //----------------------------------------------------------------------------
@@ -46,20 +46,21 @@ class Model
 
             $result = $this->db->query(
                                 "CREATE TABLE user_account (
-                                          id int(8) unsigned NOT NULL AUTO_INCREMENT,
+                                          id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
                                           username varchar(256) NOT NULL UNIQUE,
-                                          pwd varchar(256) DEFAULT NULL,
+                                          pwd varchar(256) NOT NULL,
                                           PRIMARY KEY (id) );"
             );
             if (!$result) {
                 // TODO throw exception
                 error_log("Failed creating table account",0);
             }
+            // Add sample data, password is hashed on combination of ID and inputted password
             if(!$this->db->query(
                 "INSERT INTO user_account
-                        VALUES (NULL,'admin','".password_hash('admin', PASSWORD_DEFAULT)."'),
-                            (NULL,'Bob','".password_hash('bob', PASSWORD_DEFAULT)."'),
-                            (NULL,'Mary','".password_hash('mary', PASSWORD_DEFAULT)."');"
+                        VALUES (NULL,'admin','".password_hash('1'.'admin', PASSWORD_DEFAULT)."'),
+                            (NULL,'Bob','".password_hash('2'.'bob', PASSWORD_DEFAULT)."'),
+                            (NULL,'Mary','".password_hash('3'.'mary', PASSWORD_DEFAULT)."');"
             )) {
                 // TODO throw exception
                 error_log("Failed creating sample data!",0);
