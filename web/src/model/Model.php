@@ -23,8 +23,7 @@ class Model
         $this->db = new mysqli(
             DB_HOST,
             DB_USER,
-            DB_PASS/*,
-            DB_NAME*/
+            DB_PASS
         );
 
         if (!$this->db) {
@@ -36,7 +35,7 @@ class Model
         $this->db->query("CREATE DATABASE IF NOT EXISTS ".DB_NAME.";");
 
         if (!$this->db->select_db(DB_NAME)) {
-            throw new NoMySQLException("Mysql database not available!", 0);
+            throw new MySQLDatabaseException("Mysql database not available!", 0);
         }
 
         $result = $this->db->query("SHOW TABLES LIKE 'user_account';");

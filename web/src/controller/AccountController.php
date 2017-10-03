@@ -64,11 +64,9 @@ class AccountController extends Controller
                 $accounts = $collection->getAccounts();
                 $view = new View('accountList');
                 echo $view->addData('accounts', $accounts)
-                    ->addData(
-                        'linkTo', function ($route,$params=[]) {
+                    ->addData('linkTo', function ($route,$params=[]) {
                         return $this->linkTo($route, $params);
-                    }
-                    )
+                    })
                     ->render();
             }
             else {
@@ -90,27 +88,48 @@ class AccountController extends Controller
         session_destroy();
         $view = new View('accountLoggedOut');
         echo $view->addData('linkTo', function ($route,$params=[]) {
-            return $this->linkTo($route, $params);
-        })
+                return $this->linkTo($route, $params);
+            })
             ->render();
     }
     
     /**
-     * Account Index action
+     * Account List action
+     *
+     * Lists accounts in system if user is admin.
      */
     public function listAction()
     {
-        $collection = new AccountCollectionModel();
-        $accounts = $collection->getAccounts();
-        $view = new View('accountList');
-        echo $view->addData('accounts', $accounts)
-            ->addData(
-                'linkTo', function ($route,$params=[]) {
+        session_start();
+        if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin') {
+            $collection = new AccountCollectionModel();
+            $accounts = $collection->getAccounts();
+            $view = new View('accountList');
+            echo $view->addData('accounts', $accounts)
+                ->addData('linkTo', function ($route, $params = []) {
                     return $this->linkTo($route, $params);
-                }
-            )
+                })
+                ->render();
+        }
+        else {
+            $this->redirectAction('/account/accessDenied');
+        }
+    }
+
+    /**
+     * Access Error action
+     *
+     * Displays access denied view.
+     */
+    public function accessDeniedAction()
+    {
+        $view = new View('accountAccessDenied');
+        echo $view->addData('linkTo', function ($route, $params = []) {
+                return $this->linkTo($route, $params);
+            })
             ->render();
     }
+
     /**
      * Account Create action
      */

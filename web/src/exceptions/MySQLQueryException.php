@@ -1,6 +1,6 @@
 <?php
 
-namespace cgwatkin\a2;
+namespace cgwatkin\a2\exception;
 
 /**
  * Class NoMySQLException
@@ -10,14 +10,15 @@ namespace cgwatkin\a2;
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */
-class NoMySQLException extends \Exception {
+class MySQLQueryException extends \Exception
+{
     /**
-     * NoMySQLException constructor.
+     * MySQLQueryException constructor.
      *
      * @param string $message The exception message.
      * @param int $code The code of the exception.
      */
-    public function NoMySQLException($message, $code = 0)
+    public function MySQLQueryException($message, $code = 0)
     {
         parent::__construct($message, $code);
     }

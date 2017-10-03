@@ -82,6 +82,16 @@ $collection->attachRoute(
 
 $collection->attachRoute(
     new Route(
+        '/account/accessDenied', array(
+            '_controller' => 'cgwatkin\a2\controller\AccountController::accessDeniedAction',
+            'methods' => 'GET',
+            'name' => 'accountAccessDenied'
+        )
+    )
+);
+
+$collection->attachRoute(
+    new Route(
         '/account/create', array(
         '_controller' => 'cgwatkin\a2\controller\AccountController::createAction',
         'methods' => 'GET',
