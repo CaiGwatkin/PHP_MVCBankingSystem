@@ -16,7 +16,7 @@ table {
     border-collapse: collapse;
 }
 
-table tr.column_header {
+table.account_list tr.column_header {
     background-color: slategrey;
     color: white;
 }
@@ -27,6 +27,11 @@ th, td {
 }
 
 td.id_num {
+    text-align: center;
+}
+
+td.td_input {
+    padding:0px;
     text-align: center;
 }
 

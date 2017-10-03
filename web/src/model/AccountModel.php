@@ -1,8 +1,6 @@
 <?php
 namespace cgwatkin\a2\model;
 
-use cgwatkin\a2\exception\MySQLQueryException;
-
 
 /**
  * Class AccountModel
@@ -19,14 +17,14 @@ class AccountModel extends Model
      */
     private $_id;
     /**
-     * @var string Account Name
+     * @var string Account Username
      */
-    private $_name;
+    private $_username;
 
     /**
      * @var string Account password
      */
-    private $_password;
+    private $_unformedPassword;
 
 
     /**
@@ -40,19 +38,19 @@ class AccountModel extends Model
     /**
      * @return string Account Name
      */
-    public function getName()
+    public function getUsername()
     {
-        return $this->_name;
+        return $this->_username;
     }
 
     /**
-     * @param string $_name Account name
+     * @param string $_username Account name
      *
      * @return $this AccountModel
      */
-    public function setName(string $_name)
+    public function setUsername(string $_username)
     {
-        $this->_name = $_name;
+        $this->_username = $_username;
 
         return $this;
     }
@@ -62,9 +60,9 @@ class AccountModel extends Model
      *
      * @return $this AccountModel
      */
-    public function setPassword(string $_password)
+    public function setUnformedPassword(string $_password)
     {
-        $this->_password = $_password;
+        $this->_unformedPassword = $_password;
 
         return $this;
     }
@@ -106,7 +104,7 @@ class AccountModel extends Model
 //            throw new MySQLQueryException('Query returns null from AccountModel::load');
         }
         $result = $result->fetch_assoc();
-        $this->_name = $result['username'];
+        $this->_username = $result['username'];
         $this->_id = $id;
         return $this;
     }
@@ -119,22 +117,25 @@ class AccountModel extends Model
      */
     public function save()
     {
-        $name = $this->_name??"NULL";
+        $name = $this->_username??"NULL";
         if (!isset($this->_id)) {
             // New account - Perform INSERT
             if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name','"
-                .password_hash('test', PASSWORD_DEFAULT)."');")) {
-                //TODO make work
-//                throw new MySQLQueryException('Query returns null from INSERT in AccountModel::save');
+                .password_hash($this->_unformedPassword, PASSWORD_DEFAULT)."');")) {
+                throw new MySQLQueryException('Query returns null from INSERT in AccountModel::save');
             }
             $this->_id = $this->db->insert_id;
-        } else {
+            if (!$result = $this->db->query("UPDATE user_account SET pwd = '"
+                .password_hash($this->_id.$this->_unformedPassword, PASSWORD_DEFAULT)."' WHERE id = $this->_id")) {
+                throw new MySQLQueryException('Query returns null from UPDATE pwd in AccountModel::save');
+            }
+        } /*else {
             // saving existing account - perform UPDATE
             if (!$result = $this->db->query("UPDATE user_account SET name = '$name' WHERE id = $this->_id;")) {
-//                throw new MySQLQueryException('Query returns null from UPDATE in AccountModel::save');
+//                throw new MySQLQueryException('Query returns null from UPDATE name in AccountModel::save');
             }
 
-        }
+        }*/
 
         return $this;
     }

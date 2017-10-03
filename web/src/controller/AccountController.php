@@ -1,6 +1,7 @@
 <?php
 namespace cgwatkin\a2\controller;
 
+use cgwatkin\a2\model\MySQLQueryException;
 use cgwatkin\a2\model\AccountModel;
 use cgwatkin\a2\model\AccountCollectionModel;
 use cgwatkin\a2\model\Model;
@@ -135,21 +136,49 @@ class AccountController extends Controller
     public function createAction() 
     {
         $account = new AccountModel();
-//        $names = ['Bob','Mary','Jon','Peter','Grace'];
-//        shuffle($names);
         session_start();
-        if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin' && isset($_POST['create'])) {
-            $account->setName($_POST['username'])
-                ->setPassword;
-            $account->save();
-            $id = $account->getId();
-            $view = new View('accountCreated');
-            echo $view->addData('accountId', $id)
-                ->addData(
-                    'linkTo', function ($route,$params=[]) {
-                    return $this->linkTo($route, $params);
+        if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin') {
+            if (isset($_POST['create'])) {
+                $username = $_POST['username'];
+                try {
+                    $account->setUsername($username)
+                        ->setUnformedPassword($_POST['password'])
+                        ->save();
+                } catch (MySQLQueryException $ex) {
+                    error_log($ex->getMessage());
+                    $view = new View('error');
+                    echo $view->addData('accountUsername', $username)
+                        ->addData('errorCode', '500 Internal Server Error')
+                        ->addData('errorMessage', 'Account name "'.$username.'" already exists.')
+                        ->addData('linkTo', function ($route, $params = []) {
+                            return $this->linkTo($route, $params);
+                        })
+                        ->render();
+                    return;
                 }
-                )
+                $id = $account->getId();
+                $username = $account->getUsername();
+                $view = new View('accountCreate');
+                echo $view->addData('accountId', $id)
+                    ->addData('accountUsername', $username)
+                    ->addData('linkTo', function ($route, $params = []) {
+                        return $this->linkTo($route, $params);
+                    })
+                    ->render();
+            }
+            else {
+                $view = new View('accountCreate');
+                echo $view->addData('linkTo', function ($route, $params = []) {
+                        return $this->linkTo($route, $params);
+                    })
+                    ->render();
+            }
+        }
+        else {
+            $view = new View('accountAccessDenied');
+            echo $view->addData('linkTo', function ($route, $params = []) {
+                    return $this->linkTo($route, $params);
+                })
                 ->render();
         }
     }
@@ -179,7 +208,7 @@ class AccountController extends Controller
     public function updateAction($id) 
     {
         $account = (new AccountModel())->load($id);
-        $account->setName('Joe')->save(); // new name will come from Form data
+        $account->setUsername('Joe')->save(); // new name will come from Form data
 
     }
 

@@ -1,0 +1,26 @@
+<?php include "header.phtml" ?>
+<!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
+<h1>Account Creation</h1>
+<?php if ($accountUsername): ?>
+<p>Account "<?= $accountId ?>: <?= $accountUsername ?>" created successfully.</p>
+<?php else: ?>
+<form method="POST">
+    <table>
+        <tr>
+            <td><label>New Username</label></td>
+            <td><input placeholder="Enter Username" name="username" required></td>
+        </tr>
+        <tr>
+            <td><label>New Password</label></td>
+            <td><input type="password" placeholder="Enter Password" name="password" required></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td><button name="create">Create</button></td>
+        </tr>
+    </table>
+</form>
+<?php endif ?>
+<a href=<?= $linkTo('accountList'); ?>>Back to account list</a>
+<br>
+<?php include "footer.phtml" ?>

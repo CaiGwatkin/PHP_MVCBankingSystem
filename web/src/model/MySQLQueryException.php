@@ -1,6 +1,6 @@
 <?php
 
-namespace cgwatkin\a2\exception;
+namespace cgwatkin\a2\model;
 
 /**
  * Class NoMySQLException

@@ -2,7 +2,7 @@
 <!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
 <h1>Accounts</h1>
 <p>The accounts are:</p>
-<table>
+<table class="account_list">
     <tr class="column_header">
         <th class="id_num">ID</th>
         <th>Username</th>
@@ -11,12 +11,16 @@
     <?php foreach ($accounts as $account) { ?>
     <tr class="data_column">
         <td class="id_num"><?= $account->getId() ?></td>
-        <td><?= $account->getName() ?></td>
-        <td><a href= <?= $linkTo('accountDelete', ['id' => $account->getId()]);?> >delete</a></td>
+        <td><?= $account->getUsername() ?></td>
+        <td class="td_input">
+            <a href= <?= $linkTo('accountDelete', ['id' => $account->getId()]);?>>
+                <div>delete</div>
+            </a>
+        </td>
     </tr>
     <?php } ?>
 </table>
 <br>
-<a href=<?= $linkTo('accountCreate'); ?>>Create new account.</a>
+<a href=<?= $linkTo('accountCreate'); ?>>Create new account</a>
 <br>
 <?php include "footer.phtml" ?>

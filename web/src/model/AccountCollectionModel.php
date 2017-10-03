@@ -1,8 +1,6 @@
 <?php
 namespace cgwatkin\a2\model;
 
-use cgwatkin\a2\exception\MySQLQueryException;
-
 /**
  * Class AccountCollectionModel
  *

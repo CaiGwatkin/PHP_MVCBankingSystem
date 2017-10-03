@@ -94,7 +94,7 @@ $collection->attachRoute(
     new Route(
         '/account/create', array(
         '_controller' => 'cgwatkin\a2\controller\AccountController::createAction',
-        'methods' => 'GET',
+        'methods' => array('GET', 'POST'),
         'name' => 'accountCreate'
         )
     )
