@@ -25,18 +25,17 @@ class AccountController extends Controller
     public function indexAction()
     {
         new Model(); // create table if not exist
+        $view = new View('accountLogin');
         session_start();
         if (isset($_SESSION['username'])) {
-            $view = new View('accountLoggedIn');
-            echo $view->addData('username', $_SESSION['username'])
+            $view->addData('username', $_SESSION['username'])
                 ->addData('linkTo', function ($route,$params=[]) {
                     return $this->linkTo($route, $params);
-                })
-                ->render();
+                });
         } else {
-            $view = new View('accountLogin');
-            echo $view->render();
+            $view->addData('username', null);
         }
+        echo $view->render();
     }
 
     /**

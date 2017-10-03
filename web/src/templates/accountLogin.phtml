@@ -1,4 +1,8 @@
 <?php include "header.phtml" ?>
+<?php
+session_start();
+if (!$username):
+?>
 <h1>Login</h1>
 <form method="POST">
     <table>
@@ -17,4 +21,10 @@
     </table>
 </form>
 <br>
+<?php else: ?>
+<h1>Logged in</h1>
+<p>Welcome <?= $username ?>!</p>
+<a href=<?= $linkTo('accountList');//TODO change to my accounts page ?>>View accounts.</a>
+<br>
+<?php endif; ?>
 <?php include "footer.phtml" ?>
