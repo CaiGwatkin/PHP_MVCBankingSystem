@@ -45,11 +45,9 @@ class AccountController extends Controller
     public function loginAction()
     {
         if (isset($_POST['login'])) {
-//            error_log("post received",0);
             $username = $_POST['username'];
             $account = new AccountModel();
             if (!$id = $account->checkLogin($username, $_POST['password'])) {
-//                error_log("login failed",0);
                 $view = new View('accountLoginFailed');
                 echo $view->addData('username', $username)
                     ->render();
@@ -59,7 +57,6 @@ class AccountController extends Controller
             $_SESSION['userId'] = $id;
             $_SESSION['username'] = $username;
             if ($username == 'admin') {
-//                error_log("admin login",0);
                 header('Location: /account/list');
                 $collection = new AccountCollectionModel();
                 $accounts = $collection->getAccounts();
@@ -73,18 +70,9 @@ class AccountController extends Controller
                     ->render();
             }
             else {
-//                error_log("other login",0);
                 $account = new AccountModel();
                 $account->load($id);
                 // TODO: generate new "My Account" view
-//                $view = new View('accountMyAccount');
-//                echo $view->addData('account', $account)
-//                    ->addData(
-//                        'linkTo', function ($route,$params=[]) {
-//                        return $this->linkTo($route, $params);
-//                    }
-//                    )
-//                    ->render();
             }
         }
     }

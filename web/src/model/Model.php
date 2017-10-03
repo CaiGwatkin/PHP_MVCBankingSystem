@@ -51,7 +51,7 @@ class Model
                                           PRIMARY KEY (id) );"
             );
             if (!$result) {
-                // handle appropriately
+                // TODO throw exception
                 error_log("Failed creating table account",0);
             }
             if(!$this->db->query(
@@ -60,7 +60,7 @@ class Model
                             (NULL,'Bob','".password_hash('bob', PASSWORD_DEFAULT)."'),
                             (NULL,'Mary','".password_hash('mary', PASSWORD_DEFAULT)."');"
             )) {
-                // handle appropriately
+                // TODO throw exception
                 error_log("Failed creating sample data!",0);
             }
         }

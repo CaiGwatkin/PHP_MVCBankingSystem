@@ -17,7 +17,7 @@ class AccountCollectionModel extends Model
     {
         parent::__construct();
         if (!$result = $this->db->query("SELECT id FROM user_account;")) {
-            // throw new ...
+            // TODO throw new ...
         }
         $this->_accountIds = array_column($result->fetch_all(), 0);
         $this->_N = $result->num_rows;

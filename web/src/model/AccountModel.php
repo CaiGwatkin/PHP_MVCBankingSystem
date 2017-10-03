@@ -60,12 +60,10 @@ class AccountModel extends Model
     {
         if (!$result = $this->db->query(
                 "SELECT id, pwd FROM user_account WHERE username = '$username';")) {
-            error_log("no results for username",0);
             return null;
         }
         $result = $result->fetch_assoc();
         if (!password_verify($password, $result['pwd'])) {
-            error_log("password doesn't match",0);
             return null;
         }
         else {

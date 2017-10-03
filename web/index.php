@@ -33,7 +33,7 @@ $collection->attachRoute(
             '_controller' => 'cgwatkin\a2\controller\Controller::redirectAction',
             'methods' => 'GET',
             'name' => 'indexRedirect',
-            'parameters' => array('/account', 303)
+            'parameters' => array('/account')
         )
     )
 );

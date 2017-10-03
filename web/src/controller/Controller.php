@@ -10,7 +10,13 @@ namespace cgwatkin\a2\controller;
  */
 class Controller
 {
-    public function redirectAction($url, $statusCode)
+    /**
+     * Redirect browser to new URL.
+     *
+     * @param string $url The new URL to be redirected to.
+     * @param int $statusCode The HTTP status code for redirection. 303 by default.
+     */
+    public function redirectAction($url, $statusCode = 303)
     {
         header('Location: ' . $url, true, $statusCode);
         die();
