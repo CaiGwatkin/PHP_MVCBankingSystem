@@ -29,6 +29,17 @@ $collection = new RouteCollection();
 
 $collection->attachRoute(
     new Route(
+        '/', array(
+            '_controller' => 'cgwatkin\a2\controller\Controller::redirectAction',
+            'methods' => 'GET',
+            'name' => 'indexRedirect',
+            'parameters' => array('/account', 303)
+        )
+    )
+);
+
+$collection->attachRoute(
+    new Route(
         '/account', array(
             '_controller' => 'cgwatkin\a2\controller\AccountController::indexAction',
             'methods' => 'GET',
@@ -49,7 +60,17 @@ $collection->attachRoute(
 
 $collection->attachRoute(
     new Route(
-        '/account/list/', array(
+        '/account/logout', array(
+            '_controller' => 'cgwatkin\a2\controller\AccountController::logoutAction',
+            'methods' => 'GET',
+            'name' => 'accountLogout'
+        )
+    )
+);
+
+$collection->attachRoute(
+    new Route(
+        '/account/list', array(
         '_controller' => 'cgwatkin\a2\controller\AccountController::listAction',
         'methods' => 'GET',
         'name' => 'accountList'
@@ -59,7 +80,7 @@ $collection->attachRoute(
 
 $collection->attachRoute(
     new Route(
-        '/account/create/', array(
+        '/account/create', array(
         '_controller' => 'cgwatkin\a2\controller\AccountController::createAction',
         'methods' => 'GET',
         'name' => 'accountCreate'

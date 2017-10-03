@@ -14,15 +14,33 @@ use cgwatkin\a2\view\View;
  */
 class AccountController extends Controller
 {
+    /**
+     * Account Index action
+     *
+     * Displays login page if user not logged in.
+     * Displays logged in page if user logged in.
+     */
     public function indexAction()
     {
         new Model(); // create table if not exist
-        $view = new View('accountLogin');
-        echo $view->render();
+        session_start();
+        if (isset($_SESSION['username'])) {
+            $view = new View('accountLoggedIn');
+            echo $view->addData('username', $_SESSION['username'])
+                ->addData('linkTo', function ($route,$params=[]) {
+                    return $this->linkTo($route, $params);
+                })
+                ->render();
+        } else {
+            $view = new View('accountLogin');
+            echo $view->render();
+        }
     }
 
     /**
      * Account Login action
+     *
+     * Handles POST from login form.
      */
     public function loginAction()
     {
@@ -31,13 +49,18 @@ class AccountController extends Controller
             $username = $_POST['username'];
             $account = new AccountModel();
             if (!$id = $account->checkLogin($username, $_POST['password'])) {
-                error_log("login failed",0);
+//                error_log("login failed",0);
                 $view = new View('accountLoginFailed');
                 echo $view->addData('username', $username)
                     ->render();
+                return;
             }
-            else if ($username == "admin") {
+            session_start();
+            $_SESSION['userId'] = $id;
+            $_SESSION['username'] = $username;
+            if ($username == 'admin') {
 //                error_log("admin login",0);
+                header('Location: /account/list');
                 $collection = new AccountCollectionModel();
                 $accounts = $collection->getAccounts();
                 $view = new View('accountList');
@@ -64,11 +87,22 @@ class AccountController extends Controller
 //                    ->render();
             }
         }
-//        else {
-////            error_log("no post received",0);
-//            $view = new View('accountLogin');
-//            echo $view->render();
-//        }
+    }
+    
+    /**
+     * Account Logout action
+     *
+     * Destroys the session, logging the user out.
+     */
+    public function logoutAction()
+    {
+        session_start();
+        session_destroy();
+        $view = new View('accountLoggedOut');
+        echo $view->addData('linkTo', function ($route,$params=[]) {
+            return $this->linkTo($route, $params);
+        })
+            ->render();
     }
     
     /**

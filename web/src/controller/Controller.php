@@ -10,6 +10,12 @@ namespace cgwatkin\a2\controller;
  */
 class Controller
 {
+    public function redirectAction($url, $statusCode)
+    {
+        header('Location: ' . $url, true, $statusCode);
+        die();
+    }
+    
     /**
      * Generate a link URL for a named route
      *
