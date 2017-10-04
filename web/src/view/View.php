@@ -1,12 +1,7 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: andrew
- * Date: 30/08/17
- * Time: 4:38 PM
- */
-
 namespace cgwatkin\a2\view;
+
+use cgwatkin\a2\exception\LoadTemplateException;
 
 /**
  * Class View
@@ -33,17 +28,12 @@ class View
     protected $data = array();
 
     public function __construct($template) {
-        try {
-            $file =  APP_ROOT . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $template . '.phtml';
+        $file =  APP_ROOT . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'templates' . DIRECTORY_SEPARATOR . $template . '.phtml';
 
-            if (file_exists($file)) {
-                $this->template = $file;
-            } else {
-//                throw new customException('Template ' . $template . ' not found!');
-            }
-        }
-        catch (customException $e) {
-            echo $e->errorMessage();
+        if (file_exists($file)) {
+            $this->template = $file;
+        } else {
+            throw new LoadTemplateException('Template ' . $template . ' not found');
         }
     }
 

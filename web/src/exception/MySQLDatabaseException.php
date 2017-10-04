@@ -1,26 +1,25 @@
 <?php
 
-namespace cgwatkin\a2\model;
+namespace cgwatkin\a2\exception;
 
 /**
- * Class NoMySQLException
+ * Class MySQLDatabaseException
  *
- * Thrown when a MySQL query returns null.
+ * Thrown when MySQL database cannot be loaded.
  *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */
-class MySQLQueryException extends \Exception
+class MySQLDatabaseException extends \Exception
 {
     /**
-     * MySQLQueryException constructor.
+     * NoMySQLException constructor.
      *
      * @param string $message The exception message.
      * @param int $code The code of the exception.
      */
-    public function MySQLQueryException($message, $code = 0)
+    public function NoMySQLException($message, $code = 0)
     {
         parent::__construct($message, $code);
-        error_log($message);
     }
 }

@@ -1,7 +1,9 @@
 <?php
 namespace cgwatkin\a2\controller;
 
-use cgwatkin\a2\model\MySQLQueryException;
+use cgwatkin\a2\exception\LoadTemplateException;
+use cgwatkin\a2\exception\MySQLDatabaseException;
+use cgwatkin\a2\exception\MySQLQueryException;
 use cgwatkin\a2\model\AccountModel;
 use cgwatkin\a2\model\AccountCollectionModel;
 use cgwatkin\a2\model\Model;
@@ -18,6 +20,11 @@ use cgwatkin\a2\view\View;
 class AccountController extends Controller
 {
     /**
+     * @var string The message for internal server errors.
+     */
+    private static $INTERNAL_SERVER_ERROR_MESSAGE = '500 Internal Server Error';
+
+    /**
      * Account Index action
      *
      * Displays login page if user not logged in.
@@ -25,8 +32,18 @@ class AccountController extends Controller
      */
     public function indexAction()
     {
-        new Model(); // create table if not exist
-        $view = new View('accountLogin');
+        try {
+            new Model(); // create table if not exist
+            $view = new View('accountLogin');
+        }
+        catch (MySQLDatabaseException $ex) {
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            return;
+        }
+        catch (LoadTemplateException $ex) {
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            return;
+        }
         session_start();
         if (isset($_SESSION['username'])) {
             $view->addData('username', $_SESSION['username'])
@@ -37,6 +54,30 @@ class AccountController extends Controller
             $view->addData('username', null);
         }
         echo $view->render();
+    }
+
+    /**
+     * Account Error action
+     *
+     * @param string $error The error (code + type).
+     * @param string $message The error message.
+     */
+    private function errorAction(string $error, string $message)
+    {
+        error_log($error.': '.$message);
+        try {
+            $view = new View('error');
+        }
+        catch (LoadTemplateException $ex) {
+            echo self::$INTERNAL_SERVER_ERROR_MESSAGE.': '.$ex->getMessage();
+            return;
+        }
+        echo $view->addData('error', $error)
+            ->addData('errorMessage', $message)
+            ->addData('linkTo', function ($route, $params = []) {
+                return $this->linkTo($route, $params);
+            })
+            ->render();
     }
 
     /**
@@ -52,18 +93,17 @@ class AccountController extends Controller
                     ->checkLogin($_POST['password']);
             }
             catch (MySQLQueryException $ex) {
-                error_log($ex->getMessage());
-                $view = new View('error');
-                echo $view->addData('errorCode', '500 Internal Server Error')
-                    ->addData('errorMessage', 'MySQL error')
-                    ->addData('linkTo', function ($route, $params = []) {
-                        return $this->linkTo($route, $params);
-                    })
-                    ->render();
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'MySQL error');
                 return;
             }
             if (!$account) {
-                $view = new View('accountLogin');
+                try {
+                    $view = new View('accountLogin');
+                }
+                catch (LoadTemplateException $ex) {
+                    $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                    return;
+                }
                 echo $view->addData('username', $username)
                     ->render();
                 return;
@@ -82,7 +122,13 @@ class AccountController extends Controller
             }
         }
         else {
-            $view = new View('accountLogin');
+            try {
+                $view = new View('accountLogin');
+            }
+            catch (LoadTemplateException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
+            }
             session_start();
             if (isset($_SESSION['username'])) {
                 $view->addData('loggedIn', true)
@@ -106,7 +152,13 @@ class AccountController extends Controller
     {
         session_start();
         session_destroy();
-        $view = new View('accountLoggedOut');
+        try {
+            $view = new View('accountLoggedOut');
+        }
+        catch (LoadTemplateException $ex) {
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            return;
+        }
         echo $view->addData('linkTo', function ($route,$params=[]) {
                 return $this->linkTo($route, $params);
             })
@@ -124,7 +176,13 @@ class AccountController extends Controller
         if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin') {
             $collection = new AccountCollectionModel();
             $accounts = $collection->getAccounts();
-            $view = new View('accountList');
+            try {
+                $view = new View('accountList');
+            }
+            catch (LoadTemplateException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
+            }
             echo $view->addData('accounts', $accounts)
                 ->addData('linkTo', function ($route, $params = []) {
                     return $this->linkTo($route, $params);
@@ -143,7 +201,13 @@ class AccountController extends Controller
      */
     public function accessDeniedAction()
     {
-        $view = new View('accountAccessDenied');
+        try {
+            $view = new View('accountAccessDenied');
+        }
+        catch (LoadTemplateException $ex) {
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            return;
+        }
         echo $view->addData('linkTo', function ($route, $params = []) {
                 return $this->linkTo($route, $params);
             })
@@ -166,18 +230,15 @@ class AccountController extends Controller
                 try {
                     $account->setUsername($username)
                         ->save($_POST['password']);
+                    $view = new View('accountCreate');
                 } catch (MySQLQueryException $ex) {
-                    error_log($ex->getMessage());
-                    $view = new View('error');
-                    echo $view->addData('errorCode', '500 Internal Server Error')
-                        ->addData('errorMessage', 'Account name "'.$username.'" already exists.')
-                        ->addData('linkTo', function ($route, $params = []) {
-                            return $this->linkTo($route, $params);
-                        })
-                        ->render();
+                    $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'Account name "'.$username.'" already exists.');
                     return;
                 }
-                $view = new View('accountCreate');
+                catch (LoadTemplateException $ex) {
+                    $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                    return;
+                }
                 echo $view->addData('account', $account)
                     ->addData('linkTo', function ($route, $params = []) {
                         return $this->linkTo($route, $params);
@@ -185,7 +246,13 @@ class AccountController extends Controller
                     ->render();
             }
             else {
-                $view = new View('accountCreate');
+                try {
+                    $view = new View('accountCreate');
+                }
+                catch (LoadTemplateException $ex) {
+                    $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                    return;
+                }
                 echo $view->addData('linkTo', function ($route, $params = []) {
                         return $this->linkTo($route, $params);
                     })
@@ -193,7 +260,13 @@ class AccountController extends Controller
             }
         }
         else {
-            $view = new View('accountAccessDenied');
+            try {
+                $view = new View('accountAccessDenied');
+            }
+            catch (LoadTemplateException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
+            }
             echo $view->addData('linkTo', function ($route, $params = []) {
                     return $this->linkTo($route, $params);
                 })
@@ -210,50 +283,20 @@ class AccountController extends Controller
     {
         try {
             (new AccountModel())->load($id)->delete();
+            $view = new View('accountDeleted');
         }
         catch (MySQLQueryException $ex) {
-            $message = $ex->getMessage();
-            error_log($message);
-            $view = new View('error');
-            echo $view->addData('errorCode', '500 Internal Server Error')
-                ->addData('errorMessage', $message)
-                ->addData('linkTo', function ($route, $params = []) {
-                    return $this->linkTo($route, $params);
-                })
-                ->render();
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
             return;
         }
-        $view = new View('accountDeleted');
+        catch (LoadTemplateException $ex) {
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            return;
+        }
         echo $view->addData('accountId', $id)
             ->addData('linkTo', function ($route,$params=[]) {
                     return $this->linkTo($route, $params);
                 })
             ->render();
     }
-    /**
-     * Account Update action
-     *
-     * @param int $id Account id to be updated
-     */
-    /*public function updateAction($id)
-    {
-        try {
-            $account = (new AccountModel())->load($id);
-            $account->setUsername('Joe')->save(); // new name will come from Form data
-        }
-        catch (MySQLQueryException $ex) {
-            $message = $ex->getMessage();
-            error_log($message);
-            $view = new View('error');
-            echo $view->addData('errorCode', '500 Internal Server Error')
-                ->addData('errorMessage', $message)
-                ->addData('linkTo', function ($route, $params = []) {
-                    return $this->linkTo($route, $params);
-                })
-                ->render();
-            return;
-        }
-
-    }*/
-
 }
