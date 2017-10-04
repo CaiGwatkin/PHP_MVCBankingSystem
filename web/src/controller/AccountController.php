@@ -44,34 +44,12 @@ class AccountController extends Controller
             $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
             return;
         }
-        session_start();
-        if (isset($_SESSION['username'])) {
+        if ($this->userIsLoggedIn()) {
             $view->addData('username', $_SESSION['username']);
         } else {
             $view->addData('username', null);
         }
         echo $view->render();
-    }
-
-    /**
-     * Account Error action
-     *
-     * @param string $error The error (code + type).
-     * @param string $message The error message.
-     */
-    private function errorAction(string $error, string $message)
-    {
-        error_log($error.': '.$message);
-        try {
-            $view = new View('error');
-        }
-        catch (LoadTemplateException $ex) {
-            echo self::$INTERNAL_SERVER_ERROR_MESSAGE.': '.$ex->getMessage();
-            return;
-        }
-        echo $view->addData('error', $error)
-            ->addData('errorMessage', $message)
-            ->render();
     }
 
     /**
@@ -106,7 +84,7 @@ class AccountController extends Controller
             session_start();
             $_SESSION['userId'] = $account->getId();
             $_SESSION['username'] = $username;
-            if ($username == 'admin') {
+            if ($this->userIsAdmin()) {
                 $this->redirectAction('/account/list');
             }
             else {
@@ -123,8 +101,7 @@ class AccountController extends Controller
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
             }
-            session_start();
-            if (isset($_SESSION['username'])) {
+            if ($this->userIsLoggedIn()) {
                 $view->addData('loggedIn', true)
                     ->addData('username', $_SESSION['username']);
             } else {
@@ -145,12 +122,11 @@ class AccountController extends Controller
         session_destroy();
         try {
             $view = new View('accountLoggedOut');
+            echo $view->render();
         }
         catch (LoadTemplateException $ex) {
             $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
-            return;
         }
-        echo $view->render();
     }
     
     /**
@@ -160,12 +136,15 @@ class AccountController extends Controller
      */
     public function listAction()
     {
-        session_start();
-        if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin') {
-            $collection = new AccountCollectionModel();
-            $accounts = $collection->getAccounts();
+        if ($this->userIsAdmin()) {
             try {
+                $collection = new AccountCollectionModel();
+                $accounts = $collection->getAccounts();
                 $view = new View('accountList');
+            }
+            catch (MySQLQueryException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'MySQL error');
+                return;
             }
             catch (LoadTemplateException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
@@ -204,16 +183,16 @@ class AccountController extends Controller
      */
     public function createAction() 
     {
-        $account = new AccountModel();
-        session_start();
-        if (isset($_SESSION['username']) && $_SESSION['username'] == 'admin') {
+        if ($this->userIsAdmin()) {
             if (isset($_POST['create'])) {
                 $username = $_POST['username'];
                 try {
+                    $account = new AccountModel();
                     $account->setUsername($username)
                         ->save($_POST['password']);
                     $view = new View('accountCreate');
-                } catch (MySQLQueryException $ex) {
+                }
+                catch (MySQLQueryException $ex) {
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'Account name "'.$username.'" already exists.');
                     return;
                 }
@@ -254,19 +233,72 @@ class AccountController extends Controller
      */
     public function deleteAction($id)
     {
-        try {
-            (new AccountModel())->load($id)->delete();
-            $view = new View('accountDeleted');
+        if ($this->userIsAdmin()) {
+            try {
+                (new AccountModel())->load($id)->delete();
+                $view = new View('accountDeleted');
+            } catch (MySQLQueryException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
+            } catch (LoadTemplateException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
+            }
+            echo $view->addData('accountId', $id)
+                ->render();
         }
-        catch (MySQLQueryException $ex) {
-            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
-            return;
+        else {
+            try {
+                $view = new View('accountAccessDenied');
+            }
+            catch (LoadTemplateException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
+            }
+            echo $view->render();
+        }
+    }
+
+    /**
+     * Account Error action
+     *
+     * @param string $error The error (code + type).
+     * @param string $message The error message.
+     */
+    private function errorAction(string $error, string $message)
+    {
+        error_log($error.': '.$message);
+        try {
+            $view = new View('error');
         }
         catch (LoadTemplateException $ex) {
-            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            echo self::$INTERNAL_SERVER_ERROR_MESSAGE.': '.$ex->getMessage();
             return;
         }
-        echo $view->addData('accountId', $id)
+        echo $view->addData('error', $error)
+            ->addData('errorMessage', $message)
             ->render();
+    }
+
+    /**
+     * Checks if user is logged in as admin.
+     *
+     * @return bool Whether the current user is admin.
+     */
+    private function userIsAdmin()
+    {
+        session_start();
+        return isset($_SESSION['username']) && $_SESSION['username'] == 'admin';
+    }
+
+    /**
+     * Checks if any user is logged in.
+     *
+     * @return bool Whether any user is logged in.
+     */
+    private function userIsLoggedIn()
+    {
+        session_start();
+        return isset($_SESSION['username']);
     }
 }
