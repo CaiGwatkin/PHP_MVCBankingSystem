@@ -235,8 +235,19 @@ class AccountController extends Controller
     {
         if ($this->userIsAdmin()) {
             try {
-                (new AccountModel())->load($id)->delete();
-                $view = new View('accountDeleted');
+                $account = (new AccountModel())->load($id);
+                if (!$account) {
+                    $view = new View('accountDeleted');
+                    echo $view->addData('accountId', $id)
+                        ->render();
+                }
+                else {
+                    $account->delete();
+                    $view = new View('accountDeleted');
+                    echo $view->addData('accountExists', true)
+                        ->addData('accountId', $id)
+                        ->render();
+                }
             } catch (MySQLQueryException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
@@ -244,8 +255,6 @@ class AccountController extends Controller
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
             }
-            echo $view->addData('accountId', $id)
-                ->render();
         }
         else {
             try {

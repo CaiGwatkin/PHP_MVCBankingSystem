@@ -1,7 +1,13 @@
 <?php include "header.phtml" ?>
 <!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
 <h1>Account Deletion</h1>
-<p>Account <?= $accountId ?> deleted successfully.</p>
+<p>Account <?= $accountId ?>
+    <?php if (!$accountExists): ?>
+        does not exist.
+    <?php else: ?>
+        deleted successfully.
+    <?php endif; ?>
+</p>
 <?php include "buttonAccountList.phtml" ?>
 <br>
 <?php include "footer.phtml" ?>
