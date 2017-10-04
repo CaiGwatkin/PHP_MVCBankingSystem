@@ -20,11 +20,11 @@ class AccountModel extends Model
      * @var string Account Username
      */
     private $_username;
-
+    
     /**
      * @var string Account password
      */
-    private $_unformedPassword;
+    private $_password;
 
 
     /**
@@ -54,39 +54,34 @@ class AccountModel extends Model
 
         return $this;
     }
-
-    /**
-     * @param string $_password Account password
-     *
-     * @return $this AccountModel
-     */
-    public function setUnformedPassword(string $_password)
-    {
-        $this->_unformedPassword = $_password;
-
-        return $this;
-    }
     
     /**
      * Checks that login details are valid.
      *
-     * @param string $username An account username.
-     * @param string $password The password.
+     * @param string $inputPassword The inputted password from user.
      *
-     * @return $id ID of account, if valid.
+     * @return $this AccountModel
+     * @throws MySQLQueryException
      */
-    public function checkLogin(string $username, string $password)
+    public function checkLogin(string $inputPassword)
     {
         if (!$result = $this->db->query(
-                "SELECT id, pwd FROM user_account WHERE username = '$username';")) {
-            return null;
+                "SELECT id FROM user_account WHERE username = '$this->_username';")) {
+            throw new MySQLQueryException('Error in AccountModel::checkLogin');
         }
         $result = $result->fetch_assoc();
-        if (!password_verify($result['id'].$password, $result['pwd'])) {
+        try {
+            $this->load($result['id']);
+        }
+        catch (MySQLQueryException $ex) {
+            error_log($ex->getMessage());
+            return null;
+        }
+        if (!password_verify($this->_id.$inputPassword, $this->_password)) {
             return null;
         }
         else {
-            return $result['id'];
+            return $this;
         }
     }
 
@@ -100,33 +95,38 @@ class AccountModel extends Model
      */
     public function load($id)
     {
-        if (!$result = $this->db->query("SELECT id, username FROM user_account WHERE id = $id;")) {
-            throw new MySQLQueryException('No user with id '.$id);
+        if (!$result = $this->db->query("SELECT id, username, pwd FROM user_account WHERE id = $id;")) {
+            throw new MySQLQueryException('Error in AccountModel::load');
         }
         $result = $result->fetch_assoc();
+        if ($result['id'] == null) {
+            return null;
+        }
+        $this->_id = $result['id'];
         $this->_username = $result['username'];
-        $this->_id = $id;
+        $this->_password = $result['pwd'];
         return $this;
     }
 
     /**
      * Saves account information to the database
+     *
+     * @param string $password Inputted password.
 
      * @return $this AccountModel
      * @throws MySQLQueryException
      */
-    public function save()
+    public function save(string $password)
     {
         $name = $this->_username??"NULL";
         if (!isset($this->_id)) {
             // New account - Perform INSERT
-            if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name','"
-                .password_hash($this->_unformedPassword, PASSWORD_DEFAULT)."');")) {
+            if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name','temp');")) {
                 throw new MySQLQueryException('Query returns null from INSERT in AccountModel::save');
             }
             $this->_id = $this->db->insert_id;
             if (!$result = $this->db->query("UPDATE user_account SET pwd = '"
-                .password_hash($this->_id.$this->_unformedPassword, PASSWORD_DEFAULT)."' WHERE id = $this->_id")) {
+                .password_hash($this->_id.$password, PASSWORD_DEFAULT)."' WHERE id = $this->_id")) {
                 throw new MySQLQueryException('Query returns null from UPDATE pwd in AccountModel::save');
             }
         } /*else {

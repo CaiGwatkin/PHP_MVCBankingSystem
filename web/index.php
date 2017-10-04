@@ -40,21 +40,21 @@ $collection->attachRoute(
     )
 );
 
-$collection->attachRoute(
-    new Route(
-        '/account', array(
-            '_controller' => 'cgwatkin\a2\controller\AccountController::indexAction',
-            'methods' => 'GET',
-            'name' => 'accountIndex'
-        )
-    )
-);
+//$collection->attachRoute(
+//    new Route(
+//        '/account', array(
+//            '_controller' => 'cgwatkin\a2\controller\AccountController::indexAction',
+//            'methods' => 'GET',
+//            'name' => 'accountIndex'
+//        )
+//    )
+//);
 
 $collection->attachRoute(
     new Route(
         '/account', array(
             '_controller' => 'cgwatkin\a2\controller\AccountController::loginAction',
-            'methods' => 'POST',
+            'methods' => array('GET', 'POST'),
             'name' => 'accountLogin'
         )
     )

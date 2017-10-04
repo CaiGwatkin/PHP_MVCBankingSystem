@@ -1,30 +1,28 @@
 <?php include "header.phtml" ?>
-<?php
-session_start();
-if (!$username):
-?>
-<h1>Login</h1>
-<form method="POST">
-    <table>
-        <tr>
-            <td><label>Username</label></td>
-            <td><input placeholder="Enter Username" name="username" required></td>
-        </tr>
-        <tr>
-            <td><label>Password</label></td>
-            <td><input type="password" placeholder="Enter Password" name="password" required></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><button name="login">Login</button></td>
-        </tr>
-    </table>
-</form>
-<br>
+<?php if (!$loggedIn): ?>
+    <h1>Login</h1>
+    <form method="POST">
+        <table>
+            <tr>
+                <td><label>Username</label></td>
+                <td><input placeholder="Enter Username" name="username" value="<?= $username ? $username : '' ?>" required></td>
+            </tr>
+            <tr>
+                <td><label>Password</label></td>
+                <td><input type="password" placeholder="Enter Password" name="password" required></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button name="login">Login</button></td>
+            </tr>
+        </table>
+    </form>
+    <?= $username ? '<p>Invalid username and/or password.</p>' : '' ?>
+    <br>
 <?php else: ?>
-<h1>Logged in</h1>
-<p>Welcome <?= $username ?>!</p>
-<a href=<?= $linkTo('accountList');//TODO change to my accounts page ?>>View accounts.</a>
-<br>
+    <h1>Logged in</h1>
+    <p>Welcome <?= $username ?>!</p>
+    <a href=<?= $linkTo('accountList');//TODO change to my accounts page ?>>View accounts.</a>
+    <br>
 <?php endif; ?>
 <?php include "footer.phtml" ?>

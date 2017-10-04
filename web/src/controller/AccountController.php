@@ -41,39 +41,59 @@ class AccountController extends Controller
 
     /**
      * Account Login action
-     *
-     * Handles POST from login form.
      */
     public function loginAction()
     {
         if (isset($_POST['login'])) {
             $username = $_POST['username'];
-            $account = new AccountModel();
-            if (!$id = $account->checkLogin($username, $_POST['password'])) {
-                $view = new View('accountLoginFailed');
+            try {
+                $account = (new AccountModel())
+                    ->setUsername($username)
+                    ->checkLogin($_POST['password']);
+            }
+            catch (MySQLQueryException $ex) {
+                error_log($ex->getMessage());
+                $view = new View('error');
+                echo $view->addData('errorCode', '500 Internal Server Error')
+                    ->addData('errorMessage', 'MySQL error')
+                    ->addData('linkTo', function ($route, $params = []) {
+                        return $this->linkTo($route, $params);
+                    })
+                    ->render();
+                return;
+            }
+            if (!$account) {
+                $view = new View('accountLogin');
                 echo $view->addData('username', $username)
                     ->render();
                 return;
             }
+            $username = $account->getUsername();
             session_start();
-            $_SESSION['userId'] = $id;
+            $_SESSION['userId'] = $account->getId();
             $_SESSION['username'] = $username;
             if ($username == 'admin') {
-                header('Location: /account/list');
-                $collection = new AccountCollectionModel();
-                $accounts = $collection->getAccounts();
-                $view = new View('accountList');
-                echo $view->addData('accounts', $accounts)
-                    ->addData('linkTo', function ($route,$params=[]) {
-                        return $this->linkTo($route, $params);
-                    })
-                    ->render();
+                $this->redirectAction('/account/list');
             }
             else {
-//                $account = new AccountModel();
-//                $account->load($id);
-//                // TODO: generate new "My Account" view
+                // TODO: generate new "My Account" view
+                // PLACEHOLDER
+                $this->redirectAction('/account/list');
             }
+        }
+        else {
+            $view = new View('accountLogin');
+            session_start();
+            if (isset($_SESSION['username'])) {
+                $view->addData('loggedIn', true)
+                    ->addData('username', $_SESSION['username'])
+                    ->addData('linkTo', function ($route,$params=[]) {
+                        return $this->linkTo($route, $params);
+                    });
+            } else {
+                $view->addData('username', null);
+            }
+            echo $view->render();
         }
     }
     
@@ -117,7 +137,7 @@ class AccountController extends Controller
     }
 
     /**
-     * Access Error action
+     * Access Denied action
      *
      * Displays access denied view.
      */
@@ -145,8 +165,7 @@ class AccountController extends Controller
                 $username = $_POST['username'];
                 try {
                     $account->setUsername($username)
-                        ->setUnformedPassword($_POST['password'])
-                        ->save();
+                        ->save($_POST['password']);
                 } catch (MySQLQueryException $ex) {
                     error_log($ex->getMessage());
                     $view = new View('error');
@@ -158,11 +177,8 @@ class AccountController extends Controller
                         ->render();
                     return;
                 }
-                $id = $account->getId();
-                $username = $account->getUsername();
                 $view = new View('accountCreate');
-                echo $view->addData('accountId', $id)
-                    ->addData('accountUsername', $username)
+                echo $view->addData('account', $account)
                     ->addData('linkTo', function ($route, $params = []) {
                         return $this->linkTo($route, $params);
                     })
@@ -219,7 +235,7 @@ class AccountController extends Controller
      *
      * @param int $id Account id to be updated
      */
-    public function updateAction($id) 
+    /*public function updateAction($id)
     {
         try {
             $account = (new AccountModel())->load($id);
@@ -238,6 +254,6 @@ class AccountController extends Controller
             return;
         }
 
-    }
+    }*/
 
 }

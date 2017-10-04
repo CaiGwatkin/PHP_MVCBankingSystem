@@ -1,8 +1,8 @@
 <?php include "header.phtml" ?>
 <!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
 <h1>Account Creation</h1>
-<?php if ($accountUsername): ?>
-<p>Account "<?= $accountId ?>: <?= $accountUsername ?>" created successfully.</p>
+<?php if ($account): ?>
+<p>Account "<?= $account->getId() ?>: <?= $account->getUsername() ?>" created successfully.</p>
 <?php else: ?>
 <form method="POST">
     <table>
