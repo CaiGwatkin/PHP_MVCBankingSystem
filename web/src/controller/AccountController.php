@@ -70,9 +70,9 @@ class AccountController extends Controller
                     ->render();
             }
             else {
-                $account = new AccountModel();
-                $account->load($id);
-                // TODO: generate new "My Account" view
+//                $account = new AccountModel();
+//                $account->load($id);
+//                // TODO: generate new "My Account" view
             }
         }
     }
@@ -132,6 +132,9 @@ class AccountController extends Controller
 
     /**
      * Account Create action
+     *
+     * If user is admin and request is not POST, display input for new account data.
+     * If user is admin and request is POST, try to create account and display new account.
      */
     public function createAction() 
     {
@@ -147,8 +150,7 @@ class AccountController extends Controller
                 } catch (MySQLQueryException $ex) {
                     error_log($ex->getMessage());
                     $view = new View('error');
-                    echo $view->addData('accountUsername', $username)
-                        ->addData('errorCode', '500 Internal Server Error')
+                    echo $view->addData('errorCode', '500 Internal Server Error')
                         ->addData('errorMessage', 'Account name "'.$username.'" already exists.')
                         ->addData('linkTo', function ($route, $params = []) {
                             return $this->linkTo($route, $params);
@@ -190,14 +192,26 @@ class AccountController extends Controller
      */
     public function deleteAction($id)
     {
-        (new AccountModel())->load($id)->delete();
+        try {
+            (new AccountModel())->load($id)->delete();
+        }
+        catch (MySQLQueryException $ex) {
+            $message = $ex->getMessage();
+            error_log($message);
+            $view = new View('error');
+            echo $view->addData('errorCode', '500 Internal Server Error')
+                ->addData('errorMessage', $message)
+                ->addData('linkTo', function ($route, $params = []) {
+                    return $this->linkTo($route, $params);
+                })
+                ->render();
+            return;
+        }
         $view = new View('accountDeleted');
         echo $view->addData('accountId', $id)
-            ->addData(
-                'linkTo', function ($route,$params=[]) {
+            ->addData('linkTo', function ($route,$params=[]) {
                     return $this->linkTo($route, $params);
-                }
-            )
+                })
             ->render();
     }
     /**
@@ -207,8 +221,22 @@ class AccountController extends Controller
      */
     public function updateAction($id) 
     {
-        $account = (new AccountModel())->load($id);
-        $account->setUsername('Joe')->save(); // new name will come from Form data
+        try {
+            $account = (new AccountModel())->load($id);
+            $account->setUsername('Joe')->save(); // new name will come from Form data
+        }
+        catch (MySQLQueryException $ex) {
+            $message = $ex->getMessage();
+            error_log($message);
+            $view = new View('error');
+            echo $view->addData('errorCode', '500 Internal Server Error')
+                ->addData('errorMessage', $message)
+                ->addData('linkTo', function ($route, $params = []) {
+                    return $this->linkTo($route, $params);
+                })
+                ->render();
+            return;
+        }
 
     }
 

@@ -101,7 +101,7 @@ class AccountModel extends Model
     public function load($id)
     {
         if (!$result = $this->db->query("SELECT id, username FROM user_account WHERE id = $id;")) {
-//            throw new MySQLQueryException('Query returns null from AccountModel::load');
+            throw new MySQLQueryException('No user with id '.$id);
         }
         $result = $result->fetch_assoc();
         $this->_username = $result['username'];
@@ -132,7 +132,7 @@ class AccountModel extends Model
         } /*else {
             // saving existing account - perform UPDATE
             if (!$result = $this->db->query("UPDATE user_account SET name = '$name' WHERE id = $this->_id;")) {
-//                throw new MySQLQueryException('Query returns null from UPDATE name in AccountModel::save');
+                throw new MySQLQueryException('Query returns null from UPDATE name in AccountModel::save');
             }
 
         }*/
@@ -148,8 +148,13 @@ class AccountModel extends Model
      */
     public function delete()
     {
-        if (!$result = $this->db->query("DELETE FROM user_account WHERE user_account.id = $this->_id;")) {
-//            throw new MySQLQueryException('Query returns null from AccountModel::delete');
+        if ($this->_username != 'admin') {
+            if (!$result = $this->db->query("DELETE FROM user_account WHERE id = $this->_id;")) {
+                throw new MySQLQueryException('Query returns null from AccountModel::delete');
+            }
+        }
+        else {
+            throw new MySQLQueryException('Cannot delete admin account');
         }
 
         return $this;
