@@ -1,6 +1,7 @@
 <?php
 namespace cgwatkin\a2\model;
 
+use cgwatkin\a2\exception\MySQLDatabaseException;
 use mysqli;
 
 /**
@@ -47,11 +48,11 @@ class Model
                                           id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
                                           username varchar(256) NOT NULL UNIQUE,
                                           pwd varchar(256) NOT NULL,
+                                          balance DECIMAL(19,4) NOT NULL,
                                           PRIMARY KEY (id) );"
             );
             if (!$result) {
-                throw new MySQLDatabaseException('Unable to create table user_account');
-                error_log("Failed creating table account",0);
+                throw new MySQLDatabaseException('Failed creating table: user_account');
             }
             // Add sample data, password is hashed on combination of ID and inputted password
             if(!$this->db->query(
@@ -60,8 +61,7 @@ class Model
                             (NULL,'Bob','".password_hash('2'.'bob', PASSWORD_DEFAULT)."'),
                             (NULL,'Mary','".password_hash('3'.'mary', PASSWORD_DEFAULT)."');"
             )) {
-                // TODO throw exception
-                error_log("Failed creating sample data!",0);
+                throw new MySQLDatabaseException('Failed adding sample data to table: user_account');
             }
         }
 
@@ -73,24 +73,26 @@ class Model
             $result = $this->db->query(
                 "CREATE TABLE transaction (
                                           id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
-                                          dateOf DATE NOT NULL,
-                                          typeOf CHAR NOT NULL,
+                                          datetimeOf DATETIME NOT NULL,
                                           valueOf DECIMAL(19,4) unsigned NOT NULL,
-                                          PRIMARY KEY (id) );"
+                                          fromAccount int(8) unsigned NOT NULL,
+                                          toAccount int(8) unsigned NOT NULL,
+                                          PRIMARY KEY (id),
+                                          FOREIGN KEY (fromAccount) REFERENCES user_account(id),
+                                          FOREIGN KEY (toAccount) REFERENCES user_account(id) );"
             );
             if (!$result) {
-                // TODO throw exception
-                error_log("Failed creating table account",0);
+                throw new MySQLDatabaseException('Failed creating table: transaction');
             }
             // Add sample data, password is hashed on combination of ID and inputted password
             if(!$this->db->query(
-                "INSERT INTO user_account
-                        VALUES (NULL,'admin','".password_hash('1'.'admin', PASSWORD_DEFAULT)."'),
-                            (NULL,'Bob','".password_hash('2'.'bob', PASSWORD_DEFAULT)."'),
-                            (NULL,'Mary','".password_hash('3'.'mary', PASSWORD_DEFAULT)."');"
+                "INSERT INTO transaction
+                        VALUES (NULL,".date("Y-m-d H:i:s").",20.00,1,2),
+                        (NULL,".date("Y-m-d H:i:s").",5.00,2,3),
+                        (NULL,".date("Y-m-d H:i:s").",8.00,2,1),
+                        (NULL,".date("Y-m-d H:i:s").",2.00,3,1);"
             )) {
-                // TODO throw exception
-                error_log("Failed creating sample data!",0);
+                throw new MySQLDatabaseException('Failed adding sample data to table: transaction');
             }
         }
         //----------------------------------------------------------------------------
