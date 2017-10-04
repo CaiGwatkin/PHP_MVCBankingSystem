@@ -13,14 +13,12 @@
         <td class="id_num"><?= $account->getId() ?></td>
         <td><?= $account->getUsername() ?></td>
         <td class="td_input">
-            <a href= <?= $linkTo('accountDelete', ['id' => $account->getId()]);?>>
-                <div>delete</div>
-            </a>
+            <button onclick="document.location.href='/account/delete/<?= $account->getId() ?>'">Delete</button>
         </td>
     </tr>
     <?php } ?>
 </table>
 <br>
-<a href=<?= $linkTo('accountCreate'); ?>>Create new account</a>
+<?php include "buttonAccountCreate.phtml" ?>
 <br>
 <?php include "footer.phtml" ?>

@@ -3,7 +3,7 @@
 <?php
 session_start();
 if (isset($_SESSION['username'])) {
-    echo "<a href='/account/logout'>Logout</a>";
+    include "buttonLogout.phtml";
 }
 ?>
 <p class="copyright">Copyright C. Gwatkin 2017</p>

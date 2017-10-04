@@ -46,10 +46,7 @@ class AccountController extends Controller
         }
         session_start();
         if (isset($_SESSION['username'])) {
-            $view->addData('username', $_SESSION['username'])
-                ->addData('linkTo', function ($route,$params=[]) {
-                    return $this->linkTo($route, $params);
-                });
+            $view->addData('username', $_SESSION['username']);
         } else {
             $view->addData('username', null);
         }
@@ -74,9 +71,6 @@ class AccountController extends Controller
         }
         echo $view->addData('error', $error)
             ->addData('errorMessage', $message)
-            ->addData('linkTo', function ($route, $params = []) {
-                return $this->linkTo($route, $params);
-            })
             ->render();
     }
 
@@ -132,10 +126,7 @@ class AccountController extends Controller
             session_start();
             if (isset($_SESSION['username'])) {
                 $view->addData('loggedIn', true)
-                    ->addData('username', $_SESSION['username'])
-                    ->addData('linkTo', function ($route,$params=[]) {
-                        return $this->linkTo($route, $params);
-                    });
+                    ->addData('username', $_SESSION['username']);
             } else {
                 $view->addData('username', null);
             }
@@ -159,10 +150,7 @@ class AccountController extends Controller
             $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
             return;
         }
-        echo $view->addData('linkTo', function ($route,$params=[]) {
-                return $this->linkTo($route, $params);
-            })
-            ->render();
+        echo $view->render();
     }
     
     /**
@@ -184,9 +172,6 @@ class AccountController extends Controller
                 return;
             }
             echo $view->addData('accounts', $accounts)
-                ->addData('linkTo', function ($route, $params = []) {
-                    return $this->linkTo($route, $params);
-                })
                 ->render();
         }
         else {
@@ -208,10 +193,7 @@ class AccountController extends Controller
             $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
             return;
         }
-        echo $view->addData('linkTo', function ($route, $params = []) {
-                return $this->linkTo($route, $params);
-            })
-            ->render();
+        echo $view->render();
     }
 
     /**
@@ -240,9 +222,6 @@ class AccountController extends Controller
                     return;
                 }
                 echo $view->addData('account', $account)
-                    ->addData('linkTo', function ($route, $params = []) {
-                        return $this->linkTo($route, $params);
-                    })
                     ->render();
             }
             else {
@@ -253,10 +232,7 @@ class AccountController extends Controller
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                     return;
                 }
-                echo $view->addData('linkTo', function ($route, $params = []) {
-                        return $this->linkTo($route, $params);
-                    })
-                    ->render();
+                echo $view->render();
             }
         }
         else {
@@ -267,10 +243,7 @@ class AccountController extends Controller
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
             }
-            echo $view->addData('linkTo', function ($route, $params = []) {
-                    return $this->linkTo($route, $params);
-                })
-                ->render();
+            echo $view->render();
         }
     }
 
@@ -294,9 +267,6 @@ class AccountController extends Controller
             return;
         }
         echo $view->addData('accountId', $id)
-            ->addData('linkTo', function ($route,$params=[]) {
-                    return $this->linkTo($route, $params);
-                })
             ->render();
     }
 }
