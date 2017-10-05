@@ -15,26 +15,41 @@ use cgwatkin\a2\exception\MySQLQueryException;
 class AccountModel extends Model
 {
     /**
-     * @var integer Account ID
+     * @var integer Account ID.
      */
     private $_id;
+    
     /**
-     * @var string Account Username
+     * @var string Account username.
      */
     private $_username;
     
     /**
-     * @var string Account password
+     * @var string Account password.
      */
     private $_password;
-
-
+    
+    /**
+     * @var string Account balance.
+     */
+    private $_balance;
+    
     /**
      * @return int Account ID
      */
     public function getId()
     {
         return $this->_id;
+    }
+    
+    /**
+     * @param int $id Account ID.
+     * @return AccountModel $this
+     */
+    private function setId(int $id)
+    {
+        $this->_id = $id;
+        return $this;
     }
 
     /**
@@ -48,7 +63,7 @@ class AccountModel extends Model
     /**
      * @param string $_username Account name
      *
-     * @return $this AccountModel
+     * @return AccountModel $this
      */
     public function setUsername(string $_username)
     {
@@ -58,17 +73,49 @@ class AccountModel extends Model
     }
     
     /**
+     * @param string $password Account password
+     * @return AccountModel $this
+     */
+    public function setPassword(string $password)
+    {
+        $this->_password = $password;
+        return $this;
+    }
+    
+    /**
+     * @return float Account balance.
+     */
+    public function getBalance()
+    {
+        return $this->_balance;
+    }
+    
+    /**
+     * @param float $balance Account balance.
+     * @return AccountModel $this
+     */
+    private function setBalance(float $balance)
+    {
+        $this->_balance = $balance;
+        return $this;
+    }
+    
+    /**
      * Checks that login details are valid.
      *
-     * @param string $inputPassword The inputted password from user.
+     * @param string $username The username for the account to be logged in.
+     * @param string $password The password.
      *
      * @return $this AccountModel
      * @throws MySQLQueryException
      */
-    public function checkLogin(string $inputPassword)
+    public function checkLogin(string $username, string $password)
     {
         if (!$result = $this->db->query(
-                "SELECT id FROM user_account WHERE username = '$this->_username';")) {
+            "SELECT id
+            FROM user_account
+            WHERE username = '$username';"
+        )) {
             throw new MySQLQueryException('Error in AccountModel::checkLogin');
         }
         $result = $result->fetch_assoc();
@@ -79,7 +126,7 @@ class AccountModel extends Model
             error_log($ex->getMessage());
             return null;
         }
-        if (!password_verify($this->_id.$inputPassword, $this->_password)) {
+        if (!password_verify($this->_id.$password, $this->_password)) {
             return null;
         }
         else {
@@ -97,49 +144,60 @@ class AccountModel extends Model
      */
     public function load($id)
     {
-        if (!$result = $this->db->query("SELECT id, username, pwd FROM user_account WHERE id = $id;")) {
+        if (!$result = $this->db->query(
+            "SELECT id, username, pwd, balance
+            FROM user_account
+            WHERE id = $id;"
+        )) {
             throw new MySQLQueryException('Error in AccountModel::load');
         }
-        $result = $result->fetch_assoc();
-        if ($result['id'] == null) {
-            return null;
+        if ($result->num_rows == 0) {
+            throw new MySQLQueryException('No account found with id '.$id.' in AccountModel::load');
         }
-        $this->_id = $result['id'];
-        $this->_username = $result['username'];
-        $this->_password = $result['pwd'];
-        return $this;
+        $result = $result->fetch_assoc();
+        return $this->setId($result['id'])
+            ->setUsername($result['username'])
+            ->setPassword($result['pwd'])
+            ->setBalance($result['balance']);
     }
 
     /**
      * Saves account information to the database
      *
-     * @param string $password Inputted password.
+     * Should only be called after account model object's username and password has been set.
 
      * @return $this AccountModel
      * @throws MySQLQueryException
      */
-    public function save(string $password)
+    public function save()
     {
-        $name = $this->_username??"NULL";
         if (!isset($this->_id)) {
-            // New account - Perform INSERT
-            if (!$result = $this->db->query("INSERT INTO user_account VALUES (NULL,'$name','temp');")) {
-                throw new MySQLQueryException('Query returns null from INSERT in AccountModel::save');
+            if (!$result = $this->db->query(
+                "INSERT INTO user_account
+                VALUES (
+                    NULL,
+                    '$this->_username',
+                    'temp',
+                    0.00
+                );"
+            )) {
+                throw new MySQLQueryException('Error from "INSERT INTO user_account" in AccountModel::save');
             }
-            $this->_id = $this->db->insert_id;
-            if (!$result = $this->db->query("UPDATE user_account SET pwd = '"
-                .password_hash($this->_id.$password, PASSWORD_DEFAULT)."' WHERE id = $this->_id")) {
-                throw new MySQLQueryException('Query returns null from UPDATE pwd in AccountModel::save');
+            $id = $this->db->insert_id;
+            if (!$result = $this->db->query(
+                "UPDATE user_account
+                SET pwd = '".password_hash($this->_id.$this->_password, PASSWORD_DEFAULT)."'
+                WHERE id = $id"
+            )) {
+                throw new MySQLQueryException('Error from "UPDATE user_account SET" pwd in AccountModel::save');
             }
-        } /*else {
-            // saving existing account - perform UPDATE
-            if (!$result = $this->db->query("UPDATE user_account SET name = '$name' WHERE id = $this->_id;")) {
-                throw new MySQLQueryException('Query returns null from UPDATE name in AccountModel::save');
+            try {
+                return $this->load($id);
             }
-
-        }*/
-
-        return $this;
+            catch (MySQLQueryException $ex) {
+                throw $ex;
+            }
+        }
     }
 
     /**
@@ -151,8 +209,11 @@ class AccountModel extends Model
     public function delete()
     {
         if ($this->_username != 'admin') {
-            if (!$result = $this->db->query("DELETE FROM user_account WHERE id = $this->_id;")) {
-                throw new MySQLQueryException('Query returns null from AccountModel::delete');
+            if (!$result = $this->db->query(
+                "DELETE FROM user_account
+                WHERE id = $this->_id;"
+            )) {
+                throw new MySQLQueryException('Error from DELETE in AccountModel::delete');
             }
         }
         else {

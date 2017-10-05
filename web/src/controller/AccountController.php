@@ -61,8 +61,7 @@ class AccountController extends Controller
             $username = $_POST['username'];
             try {
                 $account = (new AccountModel())
-                    ->setUsername($username)
-                    ->checkLogin($_POST['password']);
+                    ->checkLogin($username, $_POST['password']);
             }
             catch (MySQLQueryException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'MySQL error');
@@ -177,8 +176,17 @@ class AccountController extends Controller
                 try {
                     $account = new AccountModel();
                     $account->setUsername($username)
-                        ->save($_POST['password']);
-                    $view = new View('accountCreate');
+                        ->setPassword($_POST['password'])
+                        ->save();
+                    if (!$account) {
+                        $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE,
+                            'Account creation failed. Did you enter a username?');
+                        return;
+                    }
+                    else {
+                        $view = new View('accountCreate');
+                        $view->addData('account', $account);
+                    }
                 }
                 catch (MySQLQueryException $ex) {
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'Account name "'.$username.'" already exists.');
@@ -188,8 +196,7 @@ class AccountController extends Controller
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                     return;
                 }
-                echo $view->addData('account', $account)
-                    ->render();
+                echo $view->render();
             }
             else {
                 try {
@@ -229,10 +236,12 @@ class AccountController extends Controller
                         ->addData('accountId', $id)
                         ->render();
                 }
-            } catch (MySQLQueryException $ex) {
+            }
+            catch (MySQLQueryException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
-            } catch (LoadTemplateException $ex) {
+            }
+            catch (LoadTemplateException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
             }

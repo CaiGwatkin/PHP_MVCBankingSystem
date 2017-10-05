@@ -44,13 +44,13 @@ class Model
             // create it and populate with sample data
 
             $result = $this->db->query(
-                                "CREATE TABLE user_account (
-                                          id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
-                                          username varchar(256) NOT NULL UNIQUE,
-                                          pwd varchar(256) NOT NULL,
-                                          balance DECIMAL(19,4) NOT NULL,
-                                          PRIMARY KEY (id) );"
-            );
+                    "CREATE TABLE user_account (
+                        id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
+                        username varchar(256) NOT NULL UNIQUE,
+                        pwd varchar(256) NOT NULL,
+                        balance DECIMAL(19,4) NOT NULL,
+                        PRIMARY KEY (id)
+            );");
             if (!$result) {
                 error_log($this->db->error);
                 throw new MySQLDatabaseException('Failed creating table: user_account');
@@ -61,36 +61,36 @@ class Model
             $pwd3 = password_hash('3'.'mary', PASSWORD_DEFAULT);
             $pwd4 = password_hash('3'.'joe', PASSWORD_DEFAULT);
             if(!$this->db->query(
-                "INSERT INTO user_account
-                        VALUES (NULL,'admin','$pwd1','0.00'),
-                            (NULL,'Bob','$pwd2','10.00'),
-                            (NULL,'Mary','$pwd3','10.00'),
-                            (NULL,'Joe','$pwd4','10.00');"
+                    "INSERT INTO user_account
+                    VALUES (NULL,'admin','$pwd1','0.00'),
+                        (NULL,'Bob','$pwd2','10.00'),
+                        (NULL,'Mary','$pwd3','10.00'),
+                        (NULL,'Joe','$pwd4','10.00');"
             )) {
                 error_log($this->db->error);
                 throw new MySQLDatabaseException('Failed adding sample data to table: user_account');
             }
         }
 
-        $result = $this->db->query("SHOW TABLES LIKE 'transaction';");
+        $result = $this->db->query("SHOW TABLES LIKE 'transfer';");
         if ($result->num_rows == 0) {
             // table doesn't exist
             // create it and populate with sample data
 
             $result = $this->db->query(
-                "CREATE TABLE transaction (
-                                          id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
-                                          datetimeOf DATETIME NOT NULL,
-                                          valueOf DECIMAL(19,4) unsigned NOT NULL,
-                                          fromAccount int(8) unsigned NOT NULL,
-                                          toAccount int(8) unsigned NOT NULL,
-                                          PRIMARY KEY (id),
-                                          FOREIGN KEY (fromAccount) REFERENCES user_account(id),
-                                          FOREIGN KEY (toAccount) REFERENCES user_account(id) );"
-            );
+                    "CREATE TABLE transfer (
+                        id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
+                        datetimeOf DATETIME NOT NULL,
+                        valueOf DECIMAL(19,4) unsigned NOT NULL,
+                        fromAccount int(8) unsigned NOT NULL,
+                        toAccount int(8) unsigned NOT NULL,
+                        PRIMARY KEY (id),
+                        FOREIGN KEY (fromAccount) REFERENCES user_account(id) ON DELETE CASCADE,
+                        FOREIGN KEY (toAccount) REFERENCES user_account(id) ON DELETE CASCADE
+            );");
             if (!$result) {
                 error_log($this->db->error);
-                throw new MySQLDatabaseException('Failed creating table: transaction');
+                throw new MySQLDatabaseException('Failed creating table: transfer');
             }
             // Add sample data, password is hashed on combination of ID and inputted password
             $date1 = date("Y-m-d H:i:s");
@@ -98,14 +98,14 @@ class Model
             $date3 = date("Y-m-d H:i:s");
             $date4 = date("Y-m-d H:i:s");
             if(!$this->db->query(
-                "INSERT INTO transaction
-                        VALUES (NULL,'$date1',20.00,2,3),
+                    "INSERT INTO transfer
+                    VALUES (NULL,'$date1',20.00,2,3),
                         (NULL,'$date2',5.00,3,4),
                         (NULL,'$date3',8.00,3,2),
                         (NULL,'$date4',2.00,4,2);"
             )) {
                 error_log($this->db->error);
-                throw new MySQLDatabaseException('Failed adding sample data to table: transaction');
+                throw new MySQLDatabaseException('Failed adding sample data to table: transfer');
             }
         }
         //----------------------------------------------------------------------------

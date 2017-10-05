@@ -27,6 +27,9 @@ define('DB_USER', 'root');
 define('DB_PASS', 'root');
 define('DB_NAME', 'cgwatkin_a2');
 
+setlocale(LC_ALL, 'en-NZ'); // Ensure consistent currency format
+                                            // dirty workaround (should be set by user and checked later)
+
 $collection = new RouteCollection();
 
 $collection->attachRoute(
