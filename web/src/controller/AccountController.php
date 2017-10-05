@@ -95,7 +95,12 @@ class AccountController extends Controller
         }
         else {
             try {
+                new Model(); // create table if not exist
                 $view = new View('accountLogin');
+            }
+            catch (MySQLDatabaseException $ex) {
+                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+                return;
             }
             catch (LoadTemplateException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
@@ -159,23 +164,6 @@ class AccountController extends Controller
     }
 
     /**
-     * Access Denied action
-     *
-     * Displays access denied view.
-     */
-    public function accessDeniedAction()
-    {
-        try {
-            $view = new View('accountAccessDenied');
-        }
-        catch (LoadTemplateException $ex) {
-            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
-            return;
-        }
-        echo $view->render();
-    }
-
-    /**
      * Account Create action
      *
      * If user is admin and request is not POST, display input for new account data.
@@ -215,14 +203,7 @@ class AccountController extends Controller
             }
         }
         else {
-            try {
-                $view = new View('accountAccessDenied');
-            }
-            catch (LoadTemplateException $ex) {
-                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
-                return;
-            }
-            echo $view->render();
+            $this->redirectAction('/account/accessDenied');
         }
     }
 
@@ -257,36 +238,48 @@ class AccountController extends Controller
             }
         }
         else {
-            try {
-                $view = new View('accountAccessDenied');
-            }
-            catch (LoadTemplateException $ex) {
-                $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
-                return;
-            }
-            echo $view->render();
+            $this->redirectAction('/account/accessDenied');
         }
     }
 
     /**
      * Account Error action
      *
+     * Creates an error view to display error message to user.
+     *
      * @param string $error The error (code + type).
      * @param string $message The error message.
      */
     private function errorAction(string $error, string $message)
     {
-        error_log($error.': '.$message);
         try {
+            error_log($error.': '.$message);
             $view = new View('error');
+            echo $view->addData('error', $error)
+                ->addData('errorMessage', $message)
+                ->render();
         }
         catch (LoadTemplateException $ex) {
             echo self::$INTERNAL_SERVER_ERROR_MESSAGE.': '.$ex->getMessage();
             return;
         }
-        echo $view->addData('error', $error)
-            ->addData('errorMessage', $message)
-            ->render();
+    }
+
+    /**
+     * Access Denied action
+     *
+     * Displays access denied view.
+     */
+    public function accessDeniedAction()
+    {
+        try {
+            $view = new View('accountAccessDenied');
+            echo $view->render();
+        }
+        catch (LoadTemplateException $ex) {
+            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
+            return;
+        }
     }
 
     /**

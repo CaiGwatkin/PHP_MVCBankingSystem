@@ -52,15 +52,22 @@ class Model
                                           PRIMARY KEY (id) );"
             );
             if (!$result) {
+                error_log($this->db->error);
                 throw new MySQLDatabaseException('Failed creating table: user_account');
             }
             // Add sample data, password is hashed on combination of ID and inputted password
+            $pwd1 = password_hash('1'.'admin', PASSWORD_DEFAULT);
+            $pwd2 = password_hash('2'.'bob', PASSWORD_DEFAULT);
+            $pwd3 = password_hash('3'.'mary', PASSWORD_DEFAULT);
+            $pwd4 = password_hash('3'.'joe', PASSWORD_DEFAULT);
             if(!$this->db->query(
                 "INSERT INTO user_account
-                        VALUES (NULL,'admin','".password_hash('1'.'admin', PASSWORD_DEFAULT)."'),
-                            (NULL,'Bob','".password_hash('2'.'bob', PASSWORD_DEFAULT)."'),
-                            (NULL,'Mary','".password_hash('3'.'mary', PASSWORD_DEFAULT)."');"
+                        VALUES (NULL,'admin','$pwd1','0.00'),
+                            (NULL,'Bob','$pwd2','10.00'),
+                            (NULL,'Mary','$pwd3','10.00'),
+                            (NULL,'Joe','$pwd4','10.00');"
             )) {
+                error_log($this->db->error);
                 throw new MySQLDatabaseException('Failed adding sample data to table: user_account');
             }
         }
@@ -82,16 +89,22 @@ class Model
                                           FOREIGN KEY (toAccount) REFERENCES user_account(id) );"
             );
             if (!$result) {
+                error_log($this->db->error);
                 throw new MySQLDatabaseException('Failed creating table: transaction');
             }
             // Add sample data, password is hashed on combination of ID and inputted password
+            $date1 = date("Y-m-d H:i:s");
+            $date2 = date("Y-m-d H:i:s");
+            $date3 = date("Y-m-d H:i:s");
+            $date4 = date("Y-m-d H:i:s");
             if(!$this->db->query(
                 "INSERT INTO transaction
-                        VALUES (NULL,".date("Y-m-d H:i:s").",20.00,1,2),
-                        (NULL,".date("Y-m-d H:i:s").",5.00,2,3),
-                        (NULL,".date("Y-m-d H:i:s").",8.00,2,1),
-                        (NULL,".date("Y-m-d H:i:s").",2.00,3,1);"
+                        VALUES (NULL,'$date1',20.00,2,3),
+                        (NULL,'$date2',5.00,3,4),
+                        (NULL,'$date3',8.00,3,2),
+                        (NULL,'$date4',2.00,4,2);"
             )) {
+                error_log($this->db->error);
                 throw new MySQLDatabaseException('Failed adding sample data to table: transaction');
             }
         }

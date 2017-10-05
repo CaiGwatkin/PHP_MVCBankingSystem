@@ -161,7 +161,4 @@ class AccountModel extends Model
 
         return $this;
     }
-
-
-
 }
