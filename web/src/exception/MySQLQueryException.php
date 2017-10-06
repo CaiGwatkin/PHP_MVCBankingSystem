@@ -1,4 +1,7 @@
 <?php
+/*
+ * Gwatkin, 15146508
+ */
 
 namespace cgwatkin\a2\exception;
 

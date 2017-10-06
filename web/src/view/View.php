@@ -1,4 +1,7 @@
 <?php
+/*
+ * Gwatkin, 15146508
+ */
 namespace cgwatkin\a2\view;
 
 use cgwatkin\a2\exception\LoadTemplateException;

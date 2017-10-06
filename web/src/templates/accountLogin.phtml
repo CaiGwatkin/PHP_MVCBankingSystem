@@ -21,6 +21,11 @@
 <?php else: ?>
     <h1>Logged in</h1>
     <p>Welcome <?= $username ?>!</p>
-    <?php include "buttonAccountList.phtml"//TODO change to my accounts page ?>
+    <?php if ($username == 'admin') {
+        include "buttonAccountList.phtml";
+    }
+    else {
+        include "buttonTransferList.phtml";
+    }?>
 <?php endif; ?>
 <?php include "footer.phtml" ?>
