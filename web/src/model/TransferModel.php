@@ -166,14 +166,15 @@ class TransferModel extends Model
     public function save()
     {
         if (!isset($this->_id)) {
+            $date = date("Y-m-d H:i:s");
             if (!$result = $this->db->query(
                 "INSERT INTO transfer
                 VALUES (
                     NULL,
-                    '".date("Y-m-d H:i:s")."',
-                    ".$this->_valueOf."
-                    ".$this->_fromAccountID.",
-                    ".$this->_toAccountID."
+                    '$date',
+                    $this->_valueOf,
+                    $this->_fromAccountID,
+                    $this->_toAccountID
                 );"
             )) {
                 throw new MySQLQueryException('Error from "INSERT INTO transfer" in TransferModel::save');
@@ -192,24 +193,37 @@ class TransferModel extends Model
     /**
      * Makes a new transaction model.
      *
-     * @param float $value The value of the transaction.
-     * @param int $fromAccountID The ID of the account being transferred from.
-     * @param int $toAccountID The ID of the account being transferred to.
-     *
      * @return TransferModel $this
      * @throws MySQLQueryException $ex Exception generated from failed MySQL query operation.
      */
-    public function makeTransaction(float $value, int $fromAccountID, int $toAccountID)
+    public function makeTransfer()
     {
-        $this->setValueOf($value)
-            ->setFromAccountID($fromAccountID)
-            ->setToAccountID($toAccountID);
         try {
+            error_log('here1');
             $this->save();
+            $this->updateAccountBalance();
         }
         catch (MySQLQueryException $ex) {
             throw $ex;
         }
         return $this;
+    }
+
+    /**
+     * Updates account balances after transaction made.
+     *
+     * @throws MySQLQueryException
+     */
+    private function updateAccountBalance() {
+        try {
+            error_log('here');
+            (new AccountModel())->load($this->_toAccountID)
+                ->addToBalance($this->_valueOf);
+            (new AccountModel())->load($this->_fromAccountID)
+                ->subtractFromBalance($this->_valueOf);
+        }
+        catch (MySQLQueryException $ex) {
+            throw $ex;
+        }
     }
 }

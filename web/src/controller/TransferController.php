@@ -3,7 +3,10 @@ namespace cgwatkin\a2\controller;
 
 use cgwatkin\a2\exception\LoadTemplateException;
 use cgwatkin\a2\exception\MySQLQueryException;
+use cgwatkin\a2\model\AccountCollectionModel;
+use cgwatkin\a2\model\AccountModel;
 use cgwatkin\a2\model\TransferCollectionModel;
+use cgwatkin\a2\model\TransferModel;
 use cgwatkin\a2\view\View;
 
 /**
@@ -29,13 +32,15 @@ class TransferController extends Controller
             $offset = ($page - 1) * $limit;
             $accountID = $_SESSION['accountID'];
             try {
-                $transferCollection = new TransferCollectionModel($limit, $offset, $accountID);
+                $balance = (new AccountModel())->load($accountID)->getBalance();
+                $transferCollection = new TransferCollectionModel($accountID, $limit, $offset);
                 $transfers = $transferCollection->getObjects();
                 $view = new View('transferList');
                 echo $view->addData('transfers', $transfers)
                     ->addData('numTransfers', $transferCollection->getNum())
                     ->addData('username', $_SESSION['username'])
                     ->addData('accountID', $accountID)
+                    ->addData('balance', $balance)
                     ->addData('page', $page)
                     ->render();
             }
@@ -54,44 +59,45 @@ class TransferController extends Controller
     }
 
     /**
-     * Account Create action
+     * Transfer Make action
      *
-     * If user is admin and request is not POST, display input for new account data.
-     * If user is admin and request is POST, try to create account and display new account.
+     * If request is not POST, display input for new transfer data.
+     * If request is POST, try to create transfer and display new transfer.
      */
-    public function createAction()
+    public function makeAction()
     {
-        if ($this->userIsAdmin()) {
-            if (isset($_POST['create'])) {
-                $username = $_POST['username'];
+        if ($this->userIsLoggedIn()) {
+            $username = $_SESSION['username'];
+            if (isset($_POST['transfer'])) {
                 try {
-                    $account = new AccountModel();
-                    $account->setUsername($username)
-                        ->setPassword($_POST['password'])
-                        ->save();
-                    if (!$account) {
+                    $transfer = (new TransferModel())->setValueOf($_POST['valueOf'])
+                        ->setFromAccountID($_SESSION['accountID'])
+                        ->setToAccountID($_POST['toAccount'])
+                        ->makeTransfer();
+                    if (!$transfer) {
                         $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE,
-                            'Account creation failed. Did you enter a username?');
+                            'Transfer failed.');
                         return;
                     }
-                    else {
-                        $view = new View('accountCreate');
-                        $view->addData('account', $account);
-                    }
+                    $view = new View('transferMake');
+                    echo $view->addData('transfer', $transfer)
+                        ->render();
                 }
                 catch (MySQLQueryException $ex) {
-                    $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'Account name "'.$username.'" already exists.');
+                    $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                     return;
                 }
                 catch (LoadTemplateException $ex) {
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                     return;
                 }
-                echo $view->render();
             }
             else {
                 try {
-                    $view = new View('accountCreate');
+                    $accounts = (new AccountCollectionModel(null, null))->getObjects();
+                    $view = new View('transferMake');
+                    $view->addData('accounts', $accounts)
+                        ->addData('username', $username);
                 }
                 catch (LoadTemplateException $ex) {
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());

@@ -1,0 +1,41 @@
+<?php include "header.phtml" ?>
+<!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
+<h1>Make transfer from <?= $username ?>'s account</h1>
+<?php if ($transfer): ?>
+    <p>Transfer of $<?= number_format($transfer->getValueOf(), 2) ?> to account
+        <?= $transfer->getToAccountID() ?> was successful.</p>
+    <?php include "buttonTransferMake.phtml" ?>
+    <br>
+    <br>
+<?php else: ?>
+    <form method="POST">
+        <table>
+            <tr>
+                <td><label>Amount</label></td>
+                <td>
+                    <input name="valueOf" placeholder="Enter Amount" required
+                           onkeyup="this.value=this.value.replace(/[^\d.]/,'')">
+                </td>
+            </tr>
+            <tr>
+                <td><label>To</label></td>
+                <td>
+                    <select name="toAccount" title="Account ID">
+                        <?php
+                        foreach ($accounts as $account) {
+                            $id = $account->getID();
+                        ?>
+                            <option value="<?= $id ?>"><?= $id ?>
+                        <?php } ?>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button name="transfer">Transfer</button></td>
+            </tr>
+        </table>
+    </form>
+<?php endif ?>
+<?php include "buttonTransferList.phtml" ?>
+<?php include "footer.phtml" ?>

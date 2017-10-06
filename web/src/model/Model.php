@@ -59,7 +59,7 @@ class Model
             $pwd1 = password_hash('1'.'admin', PASSWORD_DEFAULT);
             $pwd2 = password_hash('2'.'bob', PASSWORD_DEFAULT);
             $pwd3 = password_hash('3'.'mary', PASSWORD_DEFAULT);
-            $pwd4 = password_hash('3'.'joe', PASSWORD_DEFAULT);
+            $pwd4 = password_hash('4'.'joe', PASSWORD_DEFAULT);
             if(!$this->db->query(
                     "INSERT INTO user_account
                     VALUES (NULL,'admin','$pwd1','0.00'),

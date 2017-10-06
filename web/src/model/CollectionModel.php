@@ -33,29 +33,42 @@ class CollectionModel extends Model
      *
      * @param callable $class The class to be generated as a collection.
      * @param string $table The table to gather collection from.
-     * @param int $limit Limit of number of rows to be returned.
-     * @param int $offset Offset from zero'th row.
+     * @param string $limitClause Full LIMIT clause.
+     * @param string $offsetClause Full OFFSET clause.
+     * @param string $orderClause Full ORDER BY clause.
+     * @param string $whereClause Full WHERE clause.
      *
      * @throws MySQLQueryException
      */
-    function __construct($class, string $table, int $limit = null, int $offset = null,
-                         string $order = null, string $whereClause = null)
+    function __construct($class, string $table, $limitClause = null, $offsetClause = null,
+                         $orderClause = null, $whereClause = null)
     {
         parent::__construct();
-        $this->loadIDs($table, $limit, $offset, $order, $whereClause);
+        try {
+            $this->loadIDs($table, $limitClause, $offsetClause, $orderClause, $whereClause);
+        }
+        catch (MySQLQueryException $ex) {
+            throw $ex;
+        }
         $this->_class = $class;
     }
 
-    private function loadIDs(string $table, $limit, $offset,
-                             $order, $whereClause) {
+    private function loadIDs(string $table, $limitClause, $offsetClause,
+                             $orderClause, $whereClause) {
         if (!$result = $this->db->query(
-            "SELECT id
-            FROM $table
-            $whereClause
-            ORDER BY $order
-            LIMIT $limit
-            OFFSET $offset;"
+            "SELECT id 
+            FROM $table 
+            $whereClause 
+            $orderClause 
+            $limitClause 
+            $offsetClause;"
         )) {
+            error_log("SELECT id 
+            FROM $table 
+            $whereClause 
+            $orderClause 
+            $limitClause 
+            $offsetClause;");
             throw new MySQLQueryException('Error from SELECT in CollectionModel::__construct');
         }
         $this->_ids = array_column($result->fetch_all(), 0);

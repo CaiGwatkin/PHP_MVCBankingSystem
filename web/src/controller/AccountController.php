@@ -181,10 +181,9 @@ class AccountController extends Controller
                             'Account creation failed. Did you enter a username?');
                         return;
                     }
-                    else {
-                        $view = new View('accountCreate');
-                        $view->addData('account', $account);
-                    }
+                    $view = new View('accountCreate');
+                    echo $view->addData('account', $account)
+                        ->render();
                 }
                 catch (MySQLQueryException $ex) {
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'Account name "'.$username.'" already exists.');
@@ -194,7 +193,6 @@ class AccountController extends Controller
                     $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                     return;
                 }
-                echo $view->render();
             }
             else {
                 try {

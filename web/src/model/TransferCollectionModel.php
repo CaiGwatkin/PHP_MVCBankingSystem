@@ -24,13 +24,19 @@ class TransferCollectionModel extends CollectionModel
      *
      * @throws MySQLQueryException
      */
-    function __construct(int $limit, int $offset, int $accountID)
+    function __construct($accountID, $limit = null, $offset = null)
     {
+        $table = 'transfer';
+        $limitClause = $limit ? "LIMIT $limit" : null;
+        $offsetClause = $offset ? "OFFSET $offset" : null;
+        $orderClause = 'ORDER BY datetimeOf DESC';
+        $whereClause = "WHERE fromAccount = $accountID OR toAccount = $accountID";
         try {
-            parent::__construct(TransferModel::class,'transfer', $limit, $offset, 'datetimeOf',
-                "WHERE fromAccount = $accountID OR toAccount = $accountID");
+            parent::__construct(TransferModel::class,$table, $limitClause, $offsetClause,
+                $orderClause, $whereClause);
         }
         catch (MySQLQueryException $ex) {
+            error_log('transfercollectionmodel error');
             throw $ex;
         }
     }

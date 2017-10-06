@@ -222,4 +222,34 @@ class AccountModel extends Model
 
         return $this;
     }
+
+    private function updateBalance() {
+        if (!$result = $this->db->query(
+            "UPDATE user_account
+            SET balance = $this->_balance
+            WHERE id = $this->_id;"
+        )) {
+            throw new MySQLQueryException('Error from UPDATE in AccountModel::addToBalance');
+        }
+    }
+
+    public function addToBalance($amount) {
+        $this->_balance += $amount;
+        try {
+            $this->updateBalance();
+        }
+        catch (MySQLQueryException $ex) {
+            throw $ex;
+        }
+    }
+
+    public function subtractFromBalance($amount) {
+        $this->_balance -= $amount;
+        try {
+            $this->updateBalance();
+        }
+        catch (MySQLQueryException $ex) {
+            throw $ex;
+        }
+    }
 }

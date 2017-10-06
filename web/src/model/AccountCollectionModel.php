@@ -23,12 +23,17 @@ class AccountCollectionModel extends CollectionModel
      *
      * @throws MySQLQueryException
      */
-    function __construct(int $limit, int $offset)
+    function __construct($limit = null, $offset = null)
     {
+        $table = 'user_account';
+        $limitClause = $limit ? "LIMIT $limit" : null;
+        $offsetClause = $offset ? "OFFSET $offset" : null;
+        $orderClause = 'ORDER BY id ASC';
         try {
-            parent::__construct(AccountModel::class, 'user_account', $limit, $offset, 'id');
+            parent::__construct(AccountModel::class, $table, $limitClause, $offsetClause, $orderClause);
         }
         catch (MySQLQueryException $ex) {
+            error_log('accountcollectionmodel error');
             throw $ex;
         }
     }

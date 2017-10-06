@@ -123,6 +123,16 @@ $collection->attachRoute(
     )
 );
 
+$collection->attachRoute(
+    new Route(
+        '/transfer/make', array(
+            '_controller' => 'cgwatkin\a2\controller\TransferController::makeAction',
+            'methods' => array('GET', 'POST'),
+            'name' => 'transferMake'
+        )
+    )
+);
+
 $router = new Router($collection);
 $router->setBasePath('/');
 
