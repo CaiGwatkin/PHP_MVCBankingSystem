@@ -30,11 +30,13 @@ if ($page > 1) {
 }
 ?>
 <?php
-if ($numAccounts == 10) {
+if ($numTransfers == 10) {
     $nextPage = $page + 1;
     include "buttonListNext.phtml";
 }
 ?>
+<br>
+<br>
 <?php include "buttonTransferMake.phtml" ?>
 <?php include "footer.phtml" ?>
 
