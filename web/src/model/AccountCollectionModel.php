@@ -33,7 +33,6 @@ class AccountCollectionModel extends CollectionModel
             parent::__construct(AccountModel::class, $table, $limitClause, $offsetClause, $orderClause);
         }
         catch (MySQLQueryException $ex) {
-            error_log('accountcollectionmodel error');
             throw $ex;
         }
     }

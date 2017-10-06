@@ -53,8 +53,23 @@ class CollectionModel extends Model
         $this->_class = $class;
     }
 
+    /**
+     *
+     *
+     * @param string $table
+     * @param $limitClause
+     * @param $offsetClause
+     * @param $orderClause
+     * @param $whereClause
+     * @throws MySQLQueryException
+     */
     private function loadIDs(string $table, $limitClause, $offsetClause,
                              $orderClause, $whereClause) {
+        $table = mysqli_real_escape_string($this->db, $table);
+        $limitClause = mysqli_real_escape_string($this->db, $limitClause);
+        $offsetClause = mysqli_real_escape_string($this->db, $offsetClause);
+        $orderClause = mysqli_real_escape_string($this->db, $orderClause);
+        $whereClause = mysqli_real_escape_string($this->db, $whereClause);
         if (!$result = $this->db->query(
             "SELECT id 
             FROM $table 
@@ -63,12 +78,6 @@ class CollectionModel extends Model
             $limitClause 
             $offsetClause;"
         )) {
-            error_log("SELECT id 
-            FROM $table 
-            $whereClause 
-            $orderClause 
-            $limitClause 
-            $offsetClause;");
             throw new MySQLQueryException('Error from SELECT in CollectionModel::__construct');
         }
         $this->_ids = array_column($result->fetch_all(), 0);

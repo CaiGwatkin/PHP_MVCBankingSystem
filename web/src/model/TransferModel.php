@@ -138,6 +138,7 @@ class TransferModel extends Model
      */
     public function load(int $id)
     {
+        $id = mysqli_real_escape_string($this->db, $id);
         if (!$result = $this->db->query(
             "SELECT id, datetimeOf, valueOf, fromAccount, toAccount
             FROM transfer
@@ -167,14 +168,17 @@ class TransferModel extends Model
     {
         if (!isset($this->_id)) {
             $date = date("Y-m-d H:i:s");
+            $valueOf = mysqli_real_escape_string($this->db, $this->_valueOf);
+            $fromAccountID = mysqli_real_escape_string($this->db, $this->_fromAccountID);
+            $toAccountID = mysqli_real_escape_string($this->db, $this->_toAccountID);
             if (!$result = $this->db->query(
                 "INSERT INTO transfer
                 VALUES (
                     NULL,
                     '$date',
-                    $this->_valueOf,
-                    $this->_fromAccountID,
-                    $this->_toAccountID
+                    $valueOf,
+                    $fromAccountID,
+                    $toAccountID
                 );"
             )) {
                 throw new MySQLQueryException('Error from "INSERT INTO transfer" in TransferModel::save');

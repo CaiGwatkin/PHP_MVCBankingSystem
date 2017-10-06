@@ -111,6 +111,7 @@ class AccountModel extends Model
      */
     public function checkLogin(string $username, string $password)
     {
+        $username = mysqli_real_escape_string($this->db, $username);
         if (!$result = $this->db->query(
             "SELECT id
             FROM user_account
@@ -144,6 +145,7 @@ class AccountModel extends Model
      */
     public function load($id)
     {
+        $id = mysqli_real_escape_string($this->db, $id);
         if (!$result = $this->db->query(
             "SELECT id, username, pwd, balance
             FROM user_account
@@ -171,32 +173,32 @@ class AccountModel extends Model
      */
     public function save()
     {
-        if (!isset($this->_id)) {
-            if (!$result = $this->db->query(
-                "INSERT INTO user_account
-                VALUES (
-                    NULL,
-                    '$this->_username',
-                    'temp',
-                    0.00
-                );"
-            )) {
-                throw new MySQLQueryException('Error from "INSERT INTO user_account" in AccountModel::save');
-            }
-            $id = $this->db->insert_id;
-            if (!$result = $this->db->query(
-                "UPDATE user_account
-                SET pwd = '".password_hash($this->_id.$this->_password, PASSWORD_DEFAULT)."'
-                WHERE id = $id"
-            )) {
-                throw new MySQLQueryException('Error from "UPDATE user_account SET" pwd in AccountModel::save');
-            }
-            try {
-                return $this->load($id);
-            }
-            catch (MySQLQueryException $ex) {
-                throw $ex;
-            }
+        $username = mysqli_real_escape_string($this->db, $this->_username);
+        if (!$result = $this->db->query(
+            "INSERT INTO user_account
+            VALUES (
+                NULL,
+                '$username',
+                'temp',
+                0.00
+            );"
+        )) {
+            throw new MySQLQueryException('Error from "INSERT INTO user_account" in AccountModel::save');
+        }
+        $this->_id = $this->db->insert_id;
+        $password = mysqli_real_escape_string($this->db, $this->_password);
+        if (!$result = $this->db->query(
+            "UPDATE user_account
+            SET pwd = '".password_hash($this->_id.$password, PASSWORD_DEFAULT)."'
+            WHERE id = $this->_id"
+        )) {
+            throw new MySQLQueryException('Error from "UPDATE user_account SET" pwd in AccountModel::save');
+        }
+        try {
+            return $this->load($this->_id);
+        }
+        catch (MySQLQueryException $ex) {
+            throw $ex;
         }
     }
 
@@ -209,9 +211,10 @@ class AccountModel extends Model
     public function delete()
     {
         if ($this->_username != 'admin') {
+            $id = mysqli_real_escape_string($this->db, $this->_id);
             if (!$result = $this->db->query(
                 "DELETE FROM user_account
-                WHERE id = $this->_id;"
+                WHERE id = $id;"
             )) {
                 throw new MySQLQueryException('Error from DELETE in AccountModel::delete');
             }
@@ -223,16 +226,29 @@ class AccountModel extends Model
         return $this;
     }
 
+    /**
+     * Update balance value for account.
+     *
+     * @throws MySQLQueryException
+     */
     private function updateBalance() {
+        $id = mysqli_real_escape_string($this->db, $this->_id);
+        $balance = mysqli_real_escape_string($this->db, $this->_balance);
         if (!$result = $this->db->query(
             "UPDATE user_account
-            SET balance = $this->_balance
-            WHERE id = $this->_id;"
+            SET balance = $balance
+            WHERE id = $id;"
         )) {
             throw new MySQLQueryException('Error from UPDATE in AccountModel::addToBalance');
         }
     }
 
+    /**
+     * Add amount to account balance.
+     *
+     * @param $amount
+     * @throws MySQLQueryException
+     */
     public function addToBalance($amount) {
         $this->_balance += $amount;
         try {
@@ -243,6 +259,12 @@ class AccountModel extends Model
         }
     }
 
+    /**
+     * Subtract amount from account balance.
+     *
+     * @param $amount
+     * @throws MySQLQueryException
+     */
     public function subtractFromBalance($amount) {
         $this->_balance -= $amount;
         try {

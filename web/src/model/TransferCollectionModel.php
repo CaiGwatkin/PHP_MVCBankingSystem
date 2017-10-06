@@ -36,7 +36,6 @@ class TransferCollectionModel extends CollectionModel
                 $orderClause, $whereClause);
         }
         catch (MySQLQueryException $ex) {
-            error_log('transfercollectionmodel error');
             throw $ex;
         }
     }
