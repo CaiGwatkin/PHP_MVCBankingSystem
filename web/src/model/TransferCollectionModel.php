@@ -20,13 +20,15 @@ class TransferCollectionModel extends CollectionModel
      *
      * @param int $limit Limit of number of rows to be returned.
      * @param int $offset Offset from zero'th row.
+     * @param int $accountID ID of account for transactions to be loaded from.
      *
      * @throws MySQLQueryException
      */
-    function __construct(int $limit, int $offset)
+    function __construct(int $limit, int $offset, int $accountID)
     {
         try {
-            parent::__construct(TransferModel::class,'transfer', $limit, $offset);
+            parent::__construct(TransferModel::class,'transfer', $limit, $offset, 'datetimeOf',
+                "WHERE fromAccount = $accountID OR toAccount = $accountID");
         }
         catch (MySQLQueryException $ex) {
             throw $ex;

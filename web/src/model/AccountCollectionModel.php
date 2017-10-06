@@ -26,7 +26,7 @@ class AccountCollectionModel extends CollectionModel
     function __construct(int $limit, int $offset)
     {
         try {
-            parent::__construct(AccountModel::class, 'user_account', $limit, $offset);
+            parent::__construct(AccountModel::class, 'user_account', $limit, $offset, 'id');
         }
         catch (MySQLQueryException $ex) {
             throw $ex;

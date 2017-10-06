@@ -20,11 +20,6 @@ use cgwatkin\a2\view\View;
 class AccountController extends Controller
 {
     /**
-     * @var string The message for internal server errors.
-     */
-    private static $INTERNAL_SERVER_ERROR_MESSAGE = '500 Internal Server Error';
-
-    /**
      * Account Index action
      *
      * Displays login page if user not logged in.
@@ -81,15 +76,13 @@ class AccountController extends Controller
             }
             $username = $account->getUsername();
             session_start();
-            $_SESSION['userId'] = $account->getId();
+            $_SESSION['accountID'] = $account->getID();
             $_SESSION['username'] = $username;
             if ($this->userIsAdmin()) {
                 $this->redirectAction('/account/list');
             }
             else {
-                // TODO: generate new "My Account" view
-                // PLACEHOLDER
-                $this->redirectAction('/account/list');
+                $this->redirectAction('/transfer/list');
             }
         }
         else {
@@ -163,7 +156,7 @@ class AccountController extends Controller
             }
         }
         else {
-            $this->redirectAction('/account/accessDenied');
+            $this->redirectAction('/accessDenied');
         }
     }
 
@@ -215,7 +208,7 @@ class AccountController extends Controller
             }
         }
         else {
-            $this->redirectAction('/account/accessDenied');
+            $this->redirectAction('/accessDenied');
         }
     }
 
@@ -252,69 +245,7 @@ class AccountController extends Controller
             }
         }
         else {
-            $this->redirectAction('/account/accessDenied');
+            $this->redirectAction('/accessDenied');
         }
-    }
-
-    /**
-     * Account Error action
-     *
-     * Creates an error view to display error message to user.
-     *
-     * @param string $error The error (code + type).
-     * @param string $message The error message.
-     */
-    private function errorAction(string $error, string $message)
-    {
-        try {
-            error_log($error.': '.$message);
-            $view = new View('error');
-            echo $view->addData('error', $error)
-                ->addData('errorMessage', $message)
-                ->render();
-        }
-        catch (LoadTemplateException $ex) {
-            echo self::$INTERNAL_SERVER_ERROR_MESSAGE.': '.$ex->getMessage();
-            return;
-        }
-    }
-
-    /**
-     * Access Denied action
-     *
-     * Displays access denied view.
-     */
-    public function accessDeniedAction()
-    {
-        try {
-            $view = new View('accountAccessDenied');
-            echo $view->render();
-        }
-        catch (LoadTemplateException $ex) {
-            $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
-            return;
-        }
-    }
-
-    /**
-     * Checks if user is logged in as admin.
-     *
-     * @return bool Whether the current user is admin.
-     */
-    private function userIsAdmin()
-    {
-        session_start();
-        return isset($_SESSION['username']) && $_SESSION['username'] == 'admin';
-    }
-
-    /**
-     * Checks if any user is logged in.
-     *
-     * @return bool Whether any user is logged in.
-     */
-    private function userIsLoggedIn()
-    {
-        session_start();
-        return isset($_SESSION['username']);
     }
 }

@@ -48,7 +48,7 @@ class Model
                         id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
                         username varchar(256) NOT NULL UNIQUE,
                         pwd varchar(256) NOT NULL,
-                        balance DECIMAL(19,4) NOT NULL,
+                        balance DECIMAL(19,2) NOT NULL,
                         PRIMARY KEY (id)
             );");
             if (!$result) {
@@ -81,7 +81,7 @@ class Model
                     "CREATE TABLE transfer (
                         id int(8) unsigned NOT NULL UNIQUE AUTO_INCREMENT,
                         datetimeOf DATETIME NOT NULL,
-                        valueOf DECIMAL(19,4) unsigned NOT NULL,
+                        valueOf DECIMAL(19,2) unsigned NOT NULL,
                         fromAccount int(8) unsigned NOT NULL,
                         toAccount int(8) unsigned NOT NULL,
                         PRIMARY KEY (id),

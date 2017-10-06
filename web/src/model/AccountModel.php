@@ -37,7 +37,7 @@ class AccountModel extends Model
     /**
      * @return int Account ID
      */
-    public function getId()
+    public function getID()
     {
         return $this->_id;
     }
@@ -46,7 +46,7 @@ class AccountModel extends Model
      * @param int $id Account ID.
      * @return AccountModel $this
      */
-    private function setId(int $id)
+    private function setID(int $id)
     {
         $this->_id = $id;
         return $this;
@@ -155,7 +155,7 @@ class AccountModel extends Model
             throw new MySQLQueryException('No account found with id '.$id.' in AccountModel::load');
         }
         $result = $result->fetch_assoc();
-        return $this->setId($result['id'])
+        return $this->setID($result['id'])
             ->setUsername($result['username'])
             ->setPassword($result['pwd'])
             ->setBalance($result['balance']);

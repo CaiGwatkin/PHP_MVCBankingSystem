@@ -1,0 +1,39 @@
+<?php include "header.phtml" ?>
+<!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
+<h1>Transfers for <?= $username ?>'s account</h1>
+<p>The transfers are:</p>
+<table class="list">
+    <tr class="column_header">
+        <th class="id_num">ID</th>
+        <th>Transfer datetime</th>
+        <th>From/To</th>
+        <th class="currency">Withdrawal</th>
+        <th class="currency">Deposit</th>
+    </tr>
+    <?php foreach ($transfers as $transfer) { ?>
+    <tr class="data_column">
+        <td class="id_num"><?= $transfer->getID() ?></td>
+        <td><?= $transfer->getDatetimeOf() ?></td>
+        <td class="id_num"><?= $transfer->getFromAccountID() == $accountID ?
+                $transfer->getToAccountID() : $transfer->getFromAccountID() ?></td>
+        <td class="currency"><?= $transfer->getFromAccountID() == $accountID ?
+                '$'.number_format($transfer->getValueOf(), 2) : '' ?></td>
+        <td class="currency"><?= $transfer->getToAccountID() == $accountID ?
+                '$'.number_format($transfer->getValueOf(), 2) : '' ?></td>
+    </tr>
+    <?php } ?>
+</table>
+<br>
+<?php
+if ($page > 1) {
+    $previousPage = $page - 1;
+    include "buttonListPrevious.phtml";
+}
+?>
+<?php
+if ($numAccounts == 10) {
+    $nextPage = $page + 1;
+    include "buttonListNext.phtml";
+}
+?>
+<?php include "footer.phtml" ?>

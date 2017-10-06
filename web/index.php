@@ -115,10 +115,10 @@ $collection->attachRoute(
 
 $collection->attachRoute(
     new Route(
-        '/account/update/:id', array(
-        '_controller' => 'cgwatkin\a2\controller\AccountController::updateAction',
-        'methods' => 'GET',
-        'name' => 'accountUpdate'
+        '/transfer/list', array(
+            '_controller' => 'cgwatkin\a2\controller\TransferController::listAction',
+            'methods' => 'GET',
+            'name' => 'transferList'
         )
     )
 );

@@ -6,14 +6,16 @@
     <tr class="column_header">
         <th class="id_num">ID</th>
         <th>Username</th>
+        <th>Balance</th>
         <th class="action">Action</th>
     </tr>
     <?php foreach ($accounts as $account) { ?>
     <tr class="data_column">
-        <td class="id_num"><?= $account->getId() ?></td>
+        <td class="id_num"><?= $account->getID() ?></td>
         <td><?= $account->getUsername() ?></td>
+        <td class="currency">$<?= number_format($account->getBalance(), 2) ?></td>
         <td class="action">
-            <button onclick="document.location.href='/account/delete/<?= $account->getId() ?>'">Delete</button>
+            <button onclick="document.location.href='/account/delete/<?= $account->getID() ?>'">Delete</button>
         </td>
     </tr>
     <?php } ?>

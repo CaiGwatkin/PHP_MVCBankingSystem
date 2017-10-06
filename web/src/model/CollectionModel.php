@@ -38,18 +38,21 @@ class CollectionModel extends Model
      *
      * @throws MySQLQueryException
      */
-    function __construct($class, string $table, int $limit = null, int $offset = null)
+    function __construct($class, string $table, int $limit = null, int $offset = null,
+                         string $order = null, string $whereClause = null)
     {
         parent::__construct();
-        $this->loadIDs($table, $limit, $offset);
+        $this->loadIDs($table, $limit, $offset, $order, $whereClause);
         $this->_class = $class;
     }
 
-    private function loadIDs(string $table, int $limit, int $offset) {
+    private function loadIDs(string $table, $limit, $offset,
+                             $order, $whereClause) {
         if (!$result = $this->db->query(
             "SELECT id
             FROM $table
-            ORDER BY id
+            $whereClause
+            ORDER BY $order
             LIMIT $limit
             OFFSET $offset;"
         )) {

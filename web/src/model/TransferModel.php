@@ -139,11 +139,12 @@ class TransferModel extends Model
     public function load(int $id)
     {
         if (!$result = $this->db->query(
-            "SELECT id, datetimeOf, valueOfL, fromAccount, toAccount
+            "SELECT id, datetimeOf, valueOf, fromAccount, toAccount
             FROM transfer
             WHERE id = $id;"
         )) {
-            throw new MySQLQueryException('Error in SELECT from AccountModel::load');
+            error_log($this->db->error);
+            throw new MySQLQueryException('Error in SELECT from TransferModel::load');
         }
         if ($result->num_rows == 0) {
             return null;

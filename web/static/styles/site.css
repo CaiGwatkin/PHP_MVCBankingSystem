@@ -30,7 +30,7 @@ th, td {
     text-align: left;
 }
 
-.action {
+.action, .currency {
     text-align: center;
 }
 
