@@ -4,14 +4,14 @@ namespace cgwatkin\a2\model;
 use cgwatkin\a2\exception\MySQLQueryException;
 
 /**
- * Class AccountCollectionModel
+ * Class TransferCollectionModel
  *
  * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
  *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */
-class AccountCollectionModel extends CollectionModel
+class TransferCollectionModel extends CollectionModel
 {
     /**
      * TransferCollectionModel constructor.
@@ -26,7 +26,7 @@ class AccountCollectionModel extends CollectionModel
     function __construct(int $limit, int $offset)
     {
         try {
-            parent::__construct(AccountModel::class, 'user_account', $limit, $offset);
+            parent::__construct(TransferModel::class,'transfer', $limit, $offset);
         }
         catch (MySQLQueryException $ex) {
             throw $ex;

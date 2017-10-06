@@ -5,14 +5,14 @@ use cgwatkin\a2\exception\MySQLQueryException;
 
 
 /**
- * Class TransactionModel
+ * Class TransferModel
  *
  * Base code provided by Andrew Gilman <a.gilman@massey.ac.nz>
  *
  * @package cgwatkin/a2
  * @author  Cai Gwatkin <caigwatkin@gmail.com>
  */
-class TransactionModel extends Model
+class TransferModel extends Model
 {
     /**
      * @var int Transaction ID.
@@ -49,7 +49,7 @@ class TransactionModel extends Model
     
     /**
      * @param int $id Transaction ID.
-     * @return TransactionModel $this
+     * @return TransferModel $this
      */
     private function setID(int $id)
     {
@@ -67,7 +67,7 @@ class TransactionModel extends Model
     
     /**
      * @param string $datetime Transaction datetime.
-     * @return TransactionModel $this
+     * @return TransferModel $this
      */
     private function setDateTimeOf(string $datetime)
     {
@@ -85,7 +85,7 @@ class TransactionModel extends Model
     
     /**
      * @param float $value Value of transaction.
-     * @return TransactionModel $this
+     * @return TransferModel $this
      */
     public function setValueOf(float $value)
     {
@@ -103,7 +103,7 @@ class TransactionModel extends Model
     
     /**
      * @param int $id The ID of the account being transferred from.
-     * @return TransactionModel $this
+     * @return TransferModel $this
      */
     public function setFromAccountID(int $id)
     {
@@ -121,7 +121,7 @@ class TransactionModel extends Model
     
     /**
      * @param int $id The ID of the account being transferred to.
-     * @return TransactionModel $this
+     * @return TransferModel $this
      */
     public function setToAccountID(int $id)
     {
@@ -133,7 +133,7 @@ class TransactionModel extends Model
      * Loads transaction model from MySQL.
      *
      * @param int $id Transaction ID.
-     * @return TransactionModel $this The transaction model.
+     * @return TransferModel $this
      * @throws MySQLQueryException $ex Exception generated from failed MySQL query operation.
      */
     public function load(int $id)
@@ -159,7 +159,7 @@ class TransactionModel extends Model
     /**
      * Saves this transaction model to MySQL database.
      *
-     * @return TransactionModel $this The transaction model.
+     * @return TransferModel $this
      * @throws MySQLQueryException $ex Exception generated from failed MySQL query operation.
      */
     public function save()
@@ -195,7 +195,7 @@ class TransactionModel extends Model
      * @param int $fromAccountID The ID of the account being transferred from.
      * @param int $toAccountID The ID of the account being transferred to.
      *
-     * @return TransactionModel $this The transaction model.
+     * @return TransferModel $this
      * @throws MySQLQueryException $ex Exception generated from failed MySQL query operation.
      */
     public function makeTransaction(float $value, int $fromAccountID, int $toAccountID)

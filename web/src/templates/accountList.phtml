@@ -2,23 +2,36 @@
 <!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
 <h1>Accounts</h1>
 <p>The accounts are:</p>
-<table class="account_list">
+<table class="list">
     <tr class="column_header">
         <th class="id_num">ID</th>
         <th>Username</th>
-        <th>Action</th>
+        <th class="action">Action</th>
     </tr>
     <?php foreach ($accounts as $account) { ?>
     <tr class="data_column">
         <td class="id_num"><?= $account->getId() ?></td>
         <td><?= $account->getUsername() ?></td>
-        <td class="td_input">
+        <td class="action">
             <button onclick="document.location.href='/account/delete/<?= $account->getId() ?>'">Delete</button>
         </td>
     </tr>
     <?php } ?>
 </table>
 <br>
-<?php include "buttonAccountCreate.phtml" ?>
+<?php
+if ($page > 1) {
+    $previousPage = $page - 1;
+    include "buttonListPrevious.phtml";
+}
+?>
+<?php
+if ($numAccounts == 10) {
+    $nextPage = $page + 1;
+    include "buttonListNext.phtml";
+}
+?>
 <br>
+<br>
+<?php include "buttonAccountCreate.phtml" ?>
 <?php include "footer.phtml" ?>

@@ -16,9 +16,13 @@ table {
     border-collapse: collapse;
 }
 
-table.account_list tr.column_header {
+table.list tr.column_header {
     background-color: slategrey;
     color: white;
+}
+
+table.list td.id_num, th.id_num {
+    text-align: center;
 }
 
 th, td {
@@ -26,13 +30,12 @@ th, td {
     text-align: left;
 }
 
-td.id_num {
+.action {
     text-align: center;
 }
 
-td.td_input {
-    padding:0px;
-    text-align: center;
+td.action {
+    padding: 0px;
 }
 
 tr.data_column td {

@@ -141,10 +141,17 @@ class AccountController extends Controller
     public function listAction()
     {
         if ($this->userIsAdmin()) {
+            $page = $_GET['page']??1;
+            $limit = 10;
+            $offset = ($page - 1) * $limit;
             try {
-                $collection = new AccountCollectionModel();
-                $accounts = $collection->getAccounts();
+                $accountCollection = new AccountCollectionModel($limit, $offset);
+                $accounts = $accountCollection->getObjects();
                 $view = new View('accountList');
+                echo $view->addData('accounts', $accounts)
+                    ->addData('numAccounts', $accountCollection->getNum())
+                    ->addData('page', $page)
+                    ->render();
             }
             catch (MySQLQueryException $ex) {
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, 'MySQL error');
@@ -154,8 +161,6 @@ class AccountController extends Controller
                 $this->errorAction(self::$INTERNAL_SERVER_ERROR_MESSAGE, $ex->getMessage());
                 return;
             }
-            echo $view->addData('accounts', $accounts)
-                ->render();
         }
         else {
             $this->redirectAction('/account/accessDenied');

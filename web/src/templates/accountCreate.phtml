@@ -2,25 +2,27 @@
 <!-- Base code provided by Andrew Gilman <a.gilman@massey.ac.nz> -->
 <h1>Account Creation</h1>
 <?php if ($account): ?>
-<p>Account "<?= $account->getId() ?>: <?= $account->getUsername() ?>" created successfully.</p>
+    <p>Account "<?= $account->getId() ?>: <?= $account->getUsername() ?>" created successfully.</p>
+    <?php include "buttonAccountCreate.phtml" ?>
+    <br>
+    <br>
 <?php else: ?>
-<form method="POST">
-    <table>
-        <tr>
-            <td><label>New Username</label></td>
-            <td><input placeholder="Enter Username" name="username" required></td>
-        </tr>
-        <tr>
-            <td><label>New Password</label></td>
-            <td><input type="password" placeholder="Enter Password" name="password" required></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td><button name="create">Create</button></td>
-        </tr>
-    </table>
-</form>
+    <form method="POST">
+        <table>
+            <tr>
+                <td><label>New Username</label></td>
+                <td><input placeholder="Enter Username" name="username" required></td>
+            </tr>
+            <tr>
+                <td><label>New Password</label></td>
+                <td><input type="password" placeholder="Enter Password" name="password" required></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button name="create">Create</button></td>
+            </tr>
+        </table>
+    </form>
 <?php endif ?>
 <?php include "buttonAccountList.phtml" ?>
-<br>
 <?php include "footer.phtml" ?>
